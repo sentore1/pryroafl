@@ -126,7 +126,9 @@ if ($numrows > 0) { ?>
 						$width = $order_width->width;
 						$height = $order_height->height;
 
-						$total_metric = $length * $width * $height / $row->volumetric_percentage;
+						// Prevent division by zero - use default 5000 if volumetric_percentage is 0 or null
+						$volumetric_percentage = (!empty($row->volumetric_percentage) && $row->volumetric_percentage > 0) ? $row->volumetric_percentage : 5000;
+						$total_metric = $length * $width * $height / $volumetric_percentage;
 
 						$db->cdp_query("SELECT * FROM cdb_styles where id= '14'");
 						$status_style_pickup = $db->cdp_registro();

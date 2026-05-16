@@ -236,6 +236,13 @@
 									</li>
 
 									<li class="sidebar-item">
+										<a href="consolidate_bulk_upload.php" class="sidebar-link">
+											<i class="mdi mdi-upload" style="color:#fc3f7"></i>
+											<span class="hide-menu"> Bulk Upload </span>
+										</a>
+									</li>
+
+									<li class="sidebar-item">
 										<a class="sidebar-link waves-effect waves-dark" href="payments_gateways_consolidate_list.php" aria-expanded="false">
 											<i class="mdi mdi-adjust" style="color:#fc3f7"></i>
 											<span class="hide-menu"><?php echo $lang['left-menu-sidebar-12'] ?> </span>

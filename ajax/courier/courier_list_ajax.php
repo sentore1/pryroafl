@@ -235,18 +235,18 @@ if ($numrows > 0) { ?>
 							<?php
 							if ($userData->userlevel == 9 || $userData->userlevel == 2) { ?>
 								<td class="text-center">
-									<?php echo $sender_data->fname; ?> <?php echo $sender_data->lname; ?>
+									<?php echo $sender_data ? ($sender_data->fname . ' ' . $sender_data->lname) : 'N/A'; ?>
 								</td>
 							<?php } ?>
 							<td class="text-center">
-								<?php echo $receiver_data->fname; ?> <?php echo $receiver_data->lname; ?>
+								<?php echo $receiver_data ? ($receiver_data->fname . ' ' . $receiver_data->lname) : 'N/A'; ?>
 							</td>
 
 							<?php
 							if ($userData->userlevel == 9 || $userData->userlevel == 2) { ?>
-								<td class="text-center"><?php echo $address_order->sender_country; ?>-<?php echo $address_order->sender_city; ?></td>
+								<td class="text-center"><?php echo $address_order ? ($address_order->sender_country . '-' . $address_order->sender_city) : 'N/A'; ?></td>
 							<?php } ?>
-							<td class="text-center"><?php echo $address_order->recipient_country; ?>-<?php echo $address_order->recipient_city; ?></td>
+							<td class="text-center"><?php echo $address_order ? ($address_order->recipient_country . '-' . $address_order->recipient_city) : 'N/A'; ?></td>
 
 							<td class="text-center"><?php echo $met_payment ? $met_payment->name_pay : '-'; ?></td>
 

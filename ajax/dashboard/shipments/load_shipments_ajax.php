@@ -120,8 +120,42 @@ if ($numrows > 0) { ?>
 						$db->cdp_query("SELECT * FROM cdb_recipients where id= '" . $row->receiver_id . "'");
 						$receiver_data = $db->cdp_registro();
 
+						// Fallback: If receiver not found in cdb_recipients, try to get from cdb_users
+						if (empty($receiver_data) || !is_object($receiver_data)) {
+							$db->cdp_query("SELECT * FROM cdb_users where id= '" . $row->receiver_id . "'");
+							$receiver_data = $db->cdp_registro();
+						}
+
+						// If still not found, create empty object to prevent errors
+						if (empty($receiver_data) || !is_object($receiver_data)) {
+							$receiver_data = (object)[
+								'fname' => 'N/A',
+								'lname' => '',
+								'email' => 'N/A',
+								'phone' => 'N/A'
+							];
+						}
+
+						// Ensure sender_data has required fields
+						if (empty($sender_data) || !is_object($sender_data)) {
+							$sender_data = (object)[
+								'fname' => 'N/A',
+								'lname' => '',
+								'email' => 'N/A',
+								'phone' => 'N/A'
+							];
+						}
+
 						$db->cdp_query("SELECT * FROM cdb_address_shipments where order_track='" . $row->order_prefix . $row->order_no . "'");
 						$address_order = $db->cdp_registro();
+
+						// Ensure address_order has required fields
+						if (empty($address_order) || !is_object($address_order)) {
+							$address_order = (object)[
+								'recipient_country' => 'N/A',
+								'recipient_city' => 'N/A'
+							];
+						}
 
 						$db->cdp_query("SELECT * FROM cdb_users where id= '" . $row->driver_id . "'");
 						$driver_data = $db->cdp_registro();
@@ -138,8 +172,24 @@ if ($numrows > 0) { ?>
 						$db->cdp_query("SELECT * FROM cdb_styles where id= '14'");
 						$status_style_pickup = $db->cdp_registro();
 
+						// Ensure status_style_pickup has required fields
+						if (empty($status_style_pickup) || !is_object($status_style_pickup)) {
+							$status_style_pickup = (object)[
+								'color' => '#cccccc',
+								'mod_style' => 'N/A'
+							];
+						}
+
 						$db->cdp_query("SELECT * FROM cdb_styles where id= '13'");
 						$status_style_consolidate = $db->cdp_registro();
+
+						// Ensure status_style_consolidate has required fields
+						if (empty($status_style_consolidate) || !is_object($status_style_consolidate)) {
+							$status_style_consolidate = (object)[
+								'color' => '#cccccc',
+								'mod_style' => 'N/A'
+							];
+						}
 
 
 						if ($row->status_invoice == 1) {

@@ -150,10 +150,15 @@ $lockerauto = $core->cdp_virtual_locker();
                 <div class="row">
                     <div class="col-12 align-self-center">
                         <div id="resultados_ajax"></div>
-                        <h4 class="page-title ">
-                            <i class="ti-package" aria-hidden="true"></i>
-                            <?php echo $lang['leftorder11'] ?>
-                        </h4>
+                        <div class="d-flex align-items-center justify-content-between">
+                            <h4 class="page-title mb-0">
+                                <i class="ti-package" aria-hidden="true"></i>
+                                <?php echo $lang['leftorder11'] ?>
+                            </h4>
+                            <a href="courier_bulk_upload.php" class="btn btn-success">
+                                <i class="fas fa-file-upload"></i> Bulk Upload Shipments
+                            </a>
+                        </div>
                         <br>
                     </div>
                 </div>

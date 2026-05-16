@@ -643,14 +643,14 @@ $lang = array(
 	"left-menu-sidebar-21" => "Pickup List",
 
 
-	"left-menu-sidebar-22" => "Consolidated",
+	"left-menu-sidebar-22" => "Container",
 	"left-menu-sidebar-2233333310" => "Shipments",
 	"left-menu-sidebar-2233333312" => "Locker packages",
-	"left-menu-sidebar-87800333" => "Consolidated locker packages",
-	"left-menu-sidebar-87800334" => "Consolidated Shipping",
-	"left-menu-sidebar-23" => "Consolidated Control Panel",
-	"left-menu-sidebar-24" => "List of Consolidated",
-	"left-menu-sidebar-25" => "Packages to Consolidate",
+	"left-menu-sidebar-87800333" => "Container locker packages",
+	"left-menu-sidebar-87800334" => "Container Shipping",
+	"left-menu-sidebar-23" => "Container Control Panel",
+	"left-menu-sidebar-24" => "List of Containers",
+	"left-menu-sidebar-25" => "Packages to Container",
 
 
 	"left-menu-sidebar-26" => "Reports",

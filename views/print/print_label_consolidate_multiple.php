@@ -45,6 +45,30 @@
 				$db->cdp_query("SELECT * FROM cdb_recipients where id= '" . $row_order->receiver_id . "'");
 				$receiver_data = $db->cdp_registro();
 
+				// Fallback: If receiver not found in cdb_recipients, try to get from cdb_users
+				if (!$receiver_data) {
+					$db->cdp_query("SELECT * FROM cdb_users where id= '" . $row_order->receiver_id . "'");
+					$receiver_data = $db->cdp_registro();
+				}
+
+				// If still not found, create empty object to prevent errors
+				if (!$receiver_data) {
+					$receiver_data = (object)[
+						'fname' => 'N/A',
+						'lname' => '',
+						'phone' => 'N/A'
+					];
+				}
+
+				// Ensure sender_data has required fields
+				if (!$sender_data) {
+					$sender_data = (object)[
+						'fname' => 'N/A',
+						'lname' => '',
+						'phone' => 'N/A'
+					];
+				}
+
 
 				$db->cdp_query("SELECT * FROM cdb_address_shipments where order_track='" . $row_order->c_prefix . $row_order->c_no . "'");
 				$address_order = $db->cdp_registro();

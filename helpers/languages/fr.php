@@ -634,14 +634,14 @@ $lang = array(
 	"left-menu-sidebar-20" => "Créer un enlèvement",
 	"left-menu-sidebar-21" => "Liste de ramassage",
 
-	"left-menu-sidebar-22" => "Consolidé",
+	"left-menu-sidebar-22" => "Conteneur",
 	"left-menu-sidebar-2233333310" => "Livraison",
 	"left-menu-sidebar-2233333312" => "Forfaits de casiers",
-	"left-menu-sidebar-87800333" => "Consolidés de paquets de casillero",
-	"left-menu-sidebar-87800334" => "Consolidés d'Envíos",
-	"left-menu-sidebar-23" => "Panneau de contrôle consolidé",
-	"left-menu-sidebar-24" => "Liste consolidée",
-	"left-menu-sidebar-25" => "Paquets à consolider",
+	"left-menu-sidebar-87800333" => "Conteneurs de paquets de casillero",
+	"left-menu-sidebar-87800334" => "Conteneurs d'Envíos",
+	"left-menu-sidebar-23" => "Panneau de contrôle conteneur",
+	"left-menu-sidebar-24" => "Liste conteneur",
+	"left-menu-sidebar-25" => "Paquets à conteneur",
 
 	"left-menu-sidebar-26" => "Rapports généraux",
 

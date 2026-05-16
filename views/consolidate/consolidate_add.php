@@ -1275,6 +1275,10 @@ if (isset($_POST["create_invoice"])) {
                                         </div>
                                         <!-- Adicionar envios al consolidado de envios-->
                                         <div class="col-md-6 text-right">
+                                            <a href="consolidate_bulk_upload.php" class="btn btn-outline-primary mr-2" title="Bulk Upload Multiple Clients">
+                                                <span class="fa fa-upload"></span>
+                                                Bulk Upload
+                                            </a>
                                             <button type="button" data-toggle="modal" data-target="#myModalConsolidate" class="btn btn-outline-dark">
                                                     <span class="fa fa-search"></span>
                                                     <?php echo $lang['leftorder148']; ?>

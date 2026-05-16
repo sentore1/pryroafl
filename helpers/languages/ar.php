@@ -628,14 +628,14 @@ $lang = array(
     "left-menu-sidebar-21" => "قائمة الالتقاط",
 
 
-    "left-menu-sidebar-22" => "موحّد",
+    "left-menu-sidebar-22" => "حاوية",
     "left-menu-sidebar-2233333310"  => "الشحنات",
     "left-menu-sidebar-2233333312"     => "حزم الخزانة",
-    "left-menu-sidebar-87800333" => "حزم خزانة موحدة",
-    "left-menu-sidebar-87800334" => "الشحن الموحد",
-    "left-menu-sidebar-23" => "لوحة تحكم موحدة",
-    "left-menu-sidebar-24" => "القائمة الموحدة",
-    "left-menu-sidebar-25" => "الحزم المراد دمجها",
+    "left-menu-sidebar-87800333" => "حاويات حزم الخزانة",
+    "left-menu-sidebar-87800334" => "حاويات الشحن",
+    "left-menu-sidebar-23" => "لوحة تحكم الحاويات",
+    "left-menu-sidebar-24" => "قائمة الحاويات",
+    "left-menu-sidebar-25" => "الحزم إلى الحاوية",
 
 
     "left-menu-sidebar-26" => "تقارير عامة",

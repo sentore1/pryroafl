@@ -60,29 +60,76 @@ $sender_data = $db->cdp_registro();
 $db->cdp_query("SELECT * FROM cdb_recipients where id= '" . $row_order->receiver_id . "'");
 $receiver_data = $db->cdp_registro();
 
+// Fallback: If receiver not found in cdb_recipients, try to get from cdb_users
+if (!$receiver_data || $receiver_data === false) {
+	$db->cdp_query("SELECT * FROM cdb_users where id= '" . $row_order->receiver_id . "'");
+	$receiver_data = $db->cdp_registro();
+}
+
+// If still not found, create empty object to prevent errors
+if (!$receiver_data || $receiver_data === false) {
+	$receiver_data = (object)[
+		'fname' => 'N/A',
+		'lname' => '',
+		'email' => 'N/A',
+		'phone' => 'N/A'
+	];
+}
+
+// Ensure sender_data has required fields
+if (!$sender_data || $sender_data === false) {
+	$sender_data = (object)[
+		'fname' => 'N/A',
+		'lname' => '',
+		'email' => 'N/A',
+		'phone' => 'N/A'
+	];
+}
+
 $db->cdp_query("SELECT * FROM cdb_address_shipments where order_track='" . $row_order->order_prefix . $row_order->order_no . "'");
 $address_order = $db->cdp_registro();
 
 $db->cdp_query("SELECT * FROM cdb_courier_com where id= '" . $row_order->order_courier . "'");
 $courier_com = $db->cdp_registro();
+if (!$courier_com || $courier_com === false) {
+	$courier_com = (object)['name_com' => 'N/A'];
+}
 
 $db->cdp_query("SELECT * FROM cdb_category where id= '" . $row_order->order_item_category . "'");
 $category = $db->cdp_registro();
+if (!$category || $category === false) {
+	$category = (object)['name_item' => 'N/A'];
+}
 
 $db->cdp_query("SELECT * FROM cdb_shipping_mode where id= '" . $row_order->order_service_options . "'");
 $order_service_options = $db->cdp_registro();
+if (!$order_service_options || $order_service_options === false) {
+	$order_service_options = (object)['ship_mode' => 'N/A'];
+}
 
 $db->cdp_query("SELECT * FROM cdb_packaging where id= '" . $row_order->order_package . "'");
 $packaging = $db->cdp_registro();
+if (!$packaging || $packaging === false) {
+	$packaging = (object)['name_pack' => 'N/A'];
+}
 
 $db->cdp_query("SELECT * FROM cdb_delivery_time where id= '" . $row_order->order_deli_time . "'");
 $delivery_time = $db->cdp_registro();
+if (!$delivery_time || $delivery_time === false) {
+	$delivery_time = (object)['delitime' => 'N/A'];
+}
 
 $db->cdp_query("SELECT * FROM cdb_branchoffices where id= '" . $row_order->agency . "'");
 $branchoffices = $db->cdp_registro();
+if (!$branchoffices || $branchoffices === false) {
+	$branchoffices = (object)['name_branch' => 'N/A'];
+}
 
 $db->cdp_query("SELECT * FROM cdb_offices where id= '" . $row_order->origin_off . "'");
 $offices = $db->cdp_registro();
+if (!$offices || $offices === false) {
+	$offices = (object)['name_off' => 'N/A'];
+}
 
 
 $db->cdp_query("SELECT * FROM cdb_add_order_item WHERE order_id='" . $_GET['id'] . "'");

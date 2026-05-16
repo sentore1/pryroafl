@@ -1,4 +1,16 @@
-   
+/* White background override */
+body {
+    background-color: #ffffff !important;
+}
+
+.page-wrapper {
+    background-color: #ffffff !important;
+}
+
+.container-fluid {
+    background-color: transparent !important;
+}
+
     .pagination {
         float: right;
         margin: 0 0 5px;
