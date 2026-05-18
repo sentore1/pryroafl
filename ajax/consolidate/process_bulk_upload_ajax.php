@@ -221,6 +221,9 @@ foreach ($data as $index => $row) {
             $volumetric_weight = ($length * $width * $height) / 5000;
             $total_weight = $weight + $volumetric_weight;
             
+            // Calculate CBM (Cubic Meter)
+            $cbm = cdp_calculateCBM($length, $width, $height, 'cm');
+            
             // Create recipient record in cdb_recipients table
             $db->cdp_query("INSERT INTO cdb_recipients (
                 fname, lname, email, phone, country, city, address, 
@@ -302,15 +305,15 @@ foreach ($data as $index => $row) {
             $db->bind(':recipient_address', $recipient_address);
             $db->cdp_execute();
             
-            // Create package record
+            // Create package record with CBM
             $db->cdp_query("INSERT INTO cdb_add_order_item (
                 order_id, order_item_description, order_item_quantity,
                 order_item_weight, order_item_length, order_item_width, order_item_height,
-                order_item_declared_value, order_item_fixed_value
+                order_item_declared_value, order_item_fixed_value, cbm
             ) VALUES (
                 :order_id, :item_description, 1,
                 :weight, :length, :width, :height,
-                0, 0
+                0, 0, :cbm
             )");
             $db->bind(':order_id', $shipment_id);
             $db->bind(':item_description', $item_description);
@@ -318,6 +321,13 @@ foreach ($data as $index => $row) {
             $db->bind(':length', $length);
             $db->bind(':width', $width);
             $db->bind(':height', $height);
+            $db->bind(':cbm', $cbm);
+            $db->cdp_execute();
+            
+            // Update order with total CBM
+            $db->cdp_query("UPDATE cdb_add_order SET total_cbm = :cbm WHERE order_id = :order_id");
+            $db->bind(':cbm', $cbm);
+            $db->bind(':order_id', $shipment_id);
             $db->cdp_execute();
             
             // Create shipment object

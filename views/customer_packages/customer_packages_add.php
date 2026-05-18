@@ -735,6 +735,16 @@ $order_prefix = $settings->prefix_online_shopping;
 
                                                     <div class="col-sm-12 col-md-6 col-lg-2">
                                                         <div class="form-group">
+                                                            <label for="emailAddress1">Total CBM (m³)</label>
+                                                            <div class="alert alert-info p-2 mb-0">
+                                                                <i class="fas fa-cube"></i> <span id="total_cbm" class="font-weight-bold">0.0000</span> m³
+                                                            </div>
+                                                            <small class="text-muted">Cubic Meter Volume</small>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="col-sm-12 col-md-6 col-lg-2">
+                                                        <div class="form-group">
                                                             <label for="emailAddress1"><?php echo $lang['leftorder2020'] ?></label>
                                                             <?php
                                                             if ($core->for_symbol !== null) {
@@ -760,6 +770,7 @@ $order_prefix = $settings->prefix_online_shopping;
                                                     <div class="text-right">
                                                         <input type="hidden" name="total_item_files" id="total_item_files" value="0" />
                                                         <input type="hidden" name="deleted_file_ids" id="deleted_file_ids" />
+                                                        <input type="hidden" name="total_cbm_input" id="total_cbm_input" value="0" />
 
                                                         <button type="submit" name="create_invoice" id="create_invoice" class="btn btn-success">
                                                             <i class="fas fa-save"></i>

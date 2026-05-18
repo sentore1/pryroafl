@@ -425,6 +425,15 @@
         </tr>
 
         <tr>
+            <td style=" border: 1px solid black; padding: 3px;" colspan="2"><b>Total CBM:</b> <span id="total_cbm"><?php echo number_format($row->total_cbm, 4); ?> m³</span></td>
+            <td style=" border: 1px solid black; padding: 3px;"></td>
+            <td style=" border: 1px solid black; padding: 3px;"></td>
+            <td style=" border: 1px solid black; padding: 3px;"></td>
+            <td style=" border: 1px solid black; padding: 3px;" colspan="3" class="text-right"></td>
+            <td style=" border: 1px solid black; padding: 3px;" class="text-center"></td>
+        </tr>
+
+        <tr>
             <td style=" border: 1px solid black; padding: 3px;" colspan="2"><b>Total declared value:</b> <span id="total_peso"><?php echo $sumador_valor_declarado; ?></span></td>
             <td style=" border: 1px solid black; padding: 3px;"></td>
             <td style=" border: 1px solid black; padding: 3px;"></td>

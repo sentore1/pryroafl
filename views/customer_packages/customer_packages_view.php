@@ -377,6 +377,30 @@ if ($row_order->status_invoice == 1) {
                                     </div>
                                 </div>
 
+                                <!-- CBM Information -->
+                                <div class="row">
+                                    <div class=" col-sm-12 col-md-4 mb-2">
+                                        <div class="">
+                                            <h5> &nbsp;<b>Total CBM:</b></h5>
+                                            <p class="text-muted  m-l-5"><i class="fas fa-cube text-info"></i> <?php echo number_format($row_order->total_cbm, 4); ?> m³</p>
+                                        </div>
+                                    </div>
+
+                                    <div class=" col-sm-12 col-md-4 mb-2">
+                                        <div class="">
+                                            <h5> &nbsp;<b>Total Weight:</b></h5>
+                                            <p class="text-muted  m-l-5"><?php echo number_format($row_order->total_weight, 2); ?> <?php echo $core->weight_p; ?></p>
+                                        </div>
+                                    </div>
+
+                                    <div class=" col-sm-12 col-md-4 mb-2">
+                                        <div class="">
+                                            <h5> &nbsp;<b>CBM Rate:</b></h5>
+                                            <p class="text-muted  m-l-5"><?php echo $core->currency; ?> <?php echo number_format($row_order->cbm_rate, 2); ?> / m³</p>
+                                        </div>
+                                    </div>
+                                </div>
+
                                 <div class="row">
 
                                     <div class=" col-sm-12 col-md-4 mb-2">

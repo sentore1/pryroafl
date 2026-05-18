@@ -547,6 +547,7 @@ function calculateFinalTotal(element = null) {
   var max_fixed_charge = 0;
   var sumador_libras = 0;
   var sumador_volumetric = 0;
+  var sumador_cbm = 0; // NEW: CBM accumulator
 
   var precio_total = 0;
   var total_impuesto = 0;
@@ -587,6 +588,10 @@ function calculateFinalTotal(element = null) {
     total_metric = parseFloat(total_metric);
 
     $("#weightVol_" + i).val(total_metric.toFixed(2));
+    
+    // Calculate CBM (Cubic Meter)
+    var cbm = (length * width * height) / 1000000;
+    sumador_cbm += cbm;
 
     sumador_libras += weight;
     sumador_volumetric += total_metric;
@@ -655,6 +660,8 @@ function calculateFinalTotal(element = null) {
   $("#total_envio").html(total_envio.toFixed(2));
   $("#total_weight").html(sumador_libras.toFixed(2));
   $("#total_vol_weight").html(sumador_volumetric.toFixed(2));
+  $("#total_cbm").html(sumador_cbm.toFixed(4)); // NEW: Display total CBM
+  $("#total_cbm_input").val(sumador_cbm.toFixed(4)); // NEW: Store CBM value
   $("#total_fixed").html(max_fixed_charge.toFixed(2));
   $("#total_declared").html(sumador_valor_declarado.toFixed(2));
 }

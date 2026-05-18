@@ -84,7 +84,7 @@ $db->cdp_query("UPDATE cdb_add_order SET  status_invoice =3  WHERE due_date<now(
 $db->cdp_execute();
 
 
-$sql = "SELECT a.order_incomplete,  a.status_invoice,  a.is_consolidate, a.is_pickup,  a.total_order, a.order_id, a.order_prefix, a.order_no, a.order_date, a.sender_id, a.receiver_id, a.order_courier, a.order_pay_mode, a.status_courier, a.driver_id, a.order_service_options,  b.mod_style, b.color FROM
+$sql = "SELECT a.order_incomplete,  a.status_invoice,  a.is_consolidate, a.is_pickup,  a.total_order, a.total_cbm, a.order_id, a.order_prefix, a.order_no, a.order_date, a.sender_id, a.receiver_id, a.order_courier, a.order_pay_mode, a.status_courier, a.driver_id, a.order_service_options,  b.mod_style, b.color FROM
 			 cdb_add_order as a
 			 INNER JOIN cdb_styles as b ON a.status_courier = b.id
 			 $sWhere
@@ -140,6 +140,7 @@ if ($numrows > 0) { ?>
 
 					<th class="text-center"><b><?php echo $lang['ldestination'] ?></b></th>
 					<th class="text-center"><b><?php echo $lang['lpayment'] ?></b></th>
+					<th class="text-center"><b>CBM (m³)</b></th>
 					<th class="text-center"><b><?php echo $lang['lstatusshipment'] ?></b></th>
 					<th class=""><b><?php echo $lang['ship-all5'] ?></b></th>
 					<th class="text-center"></th>
@@ -249,6 +250,8 @@ if ($numrows > 0) { ?>
 							<td class="text-center"><?php echo $address_order ? ($address_order->recipient_country . '-' . $address_order->recipient_city) : 'N/A'; ?></td>
 
 							<td class="text-center"><?php echo $met_payment ? $met_payment->name_pay : '-'; ?></td>
+
+							<td class="text-center"><?php echo number_format($row->total_cbm, 4); ?></td>
 
 							<td class="">
 

@@ -334,6 +334,41 @@ if ($row_order->status_invoice == 1) {
                                     </div>
                                 </div>
 
+                                <!-- CBM Information -->
+                                <div class="row">
+                                    <div class=" col-sm-12 col-md-4 mb-2">
+                                        <div class="">
+                                            <h5> &nbsp;<b>Total CBM:</b></h5>
+                                            <p class="text-muted  m-l-5"><i class="fas fa-cube text-info"></i> <?php echo number_format($row_order->total_cbm, 4); ?> m³</p>
+                                        </div>
+                                    </div>
+
+                                    <div class=" col-sm-12 col-md-4 mb-2">
+                                        <div class="">
+                                            <h5> &nbsp;<b>CBM Capacity:</b></h5>
+                                            <p class="text-muted  m-l-5"><?php echo number_format($row_order->max_cbm_capacity, 2); ?> m³</p>
+                                        </div>
+                                    </div>
+
+                                    <div class=" col-sm-12 col-md-4 mb-2">
+                                        <div class="">
+                                            <h5> &nbsp;<b>CBM Utilization:</b></h5>
+                                            <p class="text-muted  m-l-5">
+                                                <div class="progress" style="height: 20px;">
+                                                    <div class="progress-bar <?php echo $row_order->cbm_utilization_percent > 90 ? 'bg-danger' : ($row_order->cbm_utilization_percent > 70 ? 'bg-warning' : 'bg-success'); ?>" 
+                                                         role="progressbar" 
+                                                         style="width: <?php echo $row_order->cbm_utilization_percent; ?>%"
+                                                         aria-valuenow="<?php echo $row_order->cbm_utilization_percent; ?>" 
+                                                         aria-valuemin="0" 
+                                                         aria-valuemax="100">
+                                                        <?php echo number_format($row_order->cbm_utilization_percent, 1); ?>%
+                                                    </div>
+                                                </div>
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+
 
                                 <?php
                                 $track_c = $row_order->c_prefix . $row_order->c_no;

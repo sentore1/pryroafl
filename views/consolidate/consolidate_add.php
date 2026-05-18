@@ -133,7 +133,8 @@ if (isset($_POST["create_invoice"])) {
                     tax_custom_tariffis_value,
                     value_weight,
                     volumetric_percentage,
-                    total_weight,                    
+                    total_weight,
+                    total_cbm,
                     sub_total,
                     tax_discount,
                     total_tax_insurance,
@@ -172,7 +173,8 @@ if (isset($_POST["create_invoice"])) {
                     :tax_custom_tariffis_value,
                     :value_weight,
                     :volumetric_percentage,
-                    :total_weight,                    
+                    :total_weight,
+                    :total_cbm,
                     :sub_total,
                     :tax_discount,
                     :total_tax_insurance,
@@ -222,6 +224,7 @@ if (isset($_POST["create_invoice"])) {
     $db->bind(':total_tax',  floatval($_POST["impuesto_input"]));
     $db->bind(':total_order',  floatval($_POST["total_envio_input"]));
     $db->bind(':total_weight',  floatval($_POST["total_weight_input"]));
+    $db->bind(':total_cbm',  isset($_POST["total_cbm_input"]) ? floatval($_POST["total_cbm_input"]) : 0);
     $db->bind(':order_date',  date("Y-m-d H:i:s"));
     $db->bind(':agency',  cdp_sanitize($_POST["agency"]));
     $db->bind(':origin_off',  cdp_sanitize($_POST["origin_off"]));
@@ -1463,6 +1466,15 @@ if (isset($_POST["create_invoice"])) {
                                                     </div>
                                                 </div>
 
+                                                <div class="col-sm-12 col-md-6 col-lg-2">
+                                                    <div class="form-group">
+                                                        <label for="emailAddress1">Total CBM (m³)</label>
+                                                        <div class="alert alert-info p-2 mb-0">
+                                                            <i class="fas fa-cube"></i> <span id="total_cbm" class="font-weight-bold">0.0000</span> m³
+                                                        </div>
+                                                        <small class="text-muted">Cubic Meter Volume</small>
+                                                    </div>
+                                                </div>
 
                                                 <div class="col-sm-12 col-md-6 col-lg-2">
                                                     <div class="form-group">
@@ -1501,6 +1513,7 @@ if (isset($_POST["create_invoice"])) {
                                                         <input type="hidden" name="total_impuesto_aduanero_input" id="total_impuesto_aduanero_input" />
                                                         <input type="hidden" name="total_envio_input" id="total_envio_input" />
                                                         <input type="hidden" name="total_weight_input" id="total_weight_input" />
+                                                        <input type="hidden" name="total_cbm_input" id="total_cbm_input" value="0" />
 
                                                         <input type="submit" name="create_invoice" id="create_invoice" class="btn btn-success" value="<?php echo $lang['langs_084']; ?>" />
                                                     </div>

@@ -136,6 +136,14 @@ class Core
   public $prefix_locker;
   public $user_perpage;
 
+  // CBM Settings
+  public $cbm_calculation_enabled;
+  public $cbm_rate_per_cubic_meter;
+  public $cbm_vs_weight_priority;
+  public $cbm_measurement_unit;
+  public $show_package_dimensions;
+  public $show_cbm_in_forms;
+
   function __construct()
   {
     $this->db = new Conexion;
@@ -260,6 +268,14 @@ class Core
     $this->digit_random_locker = $settings->digit_random_locker;
     $this->prefix_locker = $settings->prefix_locker;
     $this->user_perpage = $settings->user_perpage;
+
+    // CBM Settings
+    $this->cbm_calculation_enabled = $settings->cbm_calculation_enabled ?? 0;
+    $this->cbm_rate_per_cubic_meter = $settings->cbm_rate_per_cubic_meter ?? 0;
+    $this->cbm_vs_weight_priority = $settings->cbm_vs_weight_priority ?? 'higher';
+    $this->cbm_measurement_unit = $settings->cbm_measurement_unit ?? 'cm';
+    $this->show_package_dimensions = $settings->show_package_dimensions ?? 1;
+    $this->show_cbm_in_forms = $settings->show_cbm_in_forms ?? 1;
 
 
 

@@ -85,7 +85,8 @@ if (isset($_POST["total_item"])) {
                     status_courier =:status_courier,
                     driver_id=:driver_id,
                     seals_package=:seals_package,
-                    total_weight=:total_weight            
+                    total_weight=:total_weight,
+                    total_cbm=:total_cbm
 
                     WHERE consolidate_id=:consolidate_id
                 
@@ -106,6 +107,7 @@ if (isset($_POST["total_item"])) {
     $db->bind(':total_tax',  floatval($_POST["impuesto_input"]));
     $db->bind(':total_order',  floatval($_POST["total_envio_input"]));
     $db->bind(':total_weight',  floatval($_POST["total_weight_input"]));
+    $db->bind(':total_cbm',  isset($_POST["total_cbm_input"]) ? floatval($_POST["total_cbm_input"]) : 0);
     $db->bind(':agency',  cdp_sanitize($_POST["agency"]));
     $db->bind(':origin_off',  cdp_sanitize($_POST["origin_off"]));
     $db->bind(':order_package',  cdp_sanitize($_POST["order_package"]));
@@ -1066,6 +1068,17 @@ if (isset($_POST["total_item"])) {
                                                 <tr>
                                                     <td colspan="2"></td>
                                                     <td colspan="2"></td>
+                                                    <td colspan="2" class="text-right"><b>Total CBM (m³):</b></td>
+                                                    <td class="text-right">
+                                                        <i class="fas fa-cube text-info"></i> 
+                                                        <span id="total_cbm" class="font-weight-bold"><?php echo isset($row_order->total_cbm) ? number_format($row_order->total_cbm, 4) : '0.0000'; ?></span> m³
+                                                    </td>
+                                                    <td></td>
+                                                </tr>
+
+                                                <tr>
+                                                    <td colspan="2"></td>
+                                                    <td colspan="2"></td>
                                                     <td colspan="2" class="text-right"><b><?php echo $lang['leftorder2020'] ?> &nbsp; <?php echo $core->currency; ?></b></td>
                                                     <td class="text-right" id="total_envio"><?php echo $total_envio; ?></td>
                                                     <td></td>
@@ -1109,6 +1122,7 @@ if (isset($_POST["total_item"])) {
                                                         <input type="hidden" name="total_impuesto_aduanero_input" id="total_impuesto_aduanero_input" />
                                                         <input type="hidden" name="total_envio_input" id="total_envio_input" />
                                                         <input type="hidden" name="total_weight_input" id="total_weight_input" />
+                                                        <input type="hidden" name="total_cbm_input" id="total_cbm_input" value="<?php echo isset($row_order->total_cbm) ? $row_order->total_cbm : 0; ?>" />
 
                                                         <input type="submit" name="create_invoice" id="create_invoice" class="btn btn-success" value="<?php echo $lang['langs_10084']; ?>" />
                                                     </div>

@@ -858,6 +858,16 @@ $address_order = $db->cdp_registro();
 
                                             <div class="col-sm-12 col-md-6 col-lg-2">
                                                 <div class="form-group">
+                                                    <label style="font-weight: bold;">Total CBM (m³)</label>
+                                                    <div class="alert alert-info p-2 mb-0">
+                                                        <i class="fas fa-cube"></i> <span id="total_cbm" class="font-weight-bold">0.0000</span> m³
+                                                    </div>
+                                                    <small class="text-muted">Cubic Meter Volume</small>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-sm-12 col-md-6 col-lg-2">
+                                                <div class="form-group">
                                                     <label style="font-weight: bold;"><?php echo $lang['leftorder2020'] ?></label>
                                                     <?php
                                                     if ($core->for_symbol !== null) {

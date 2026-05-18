@@ -37,6 +37,10 @@
 							<a href="tools.php?list=config_email" class="list-group-item-action"><i class="mdi mdi-email"></i> <?php echo $lang['leftemail'] ?></a>
 						</li>
 
+						<li class="list-group-item sidebar-item">
+							<a href="tools.php?list=config_cbm" class="list-group-item-action"><i class="fas fa-cube"></i> CBM Configuration</a>
+						</li>
+
 						<li class="list-group-item  sidebar-item">
 							<a href="config_whatsapp.php" class="list-group-item-action">
 								<b><i class="fab fa-whatsapp" style="font-size: 16px;"></i></b>

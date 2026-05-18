@@ -507,6 +507,7 @@ function cdp_cal_final_total() {
   var sumador_total = 0;
   var sumador_libras = 0;
   var sumador_volumetric = 0;
+  var sumador_cbm = 0; // NEW: CBM accumulator
 
   var precio_total = 0;
   var total_impuesto = 0;
@@ -556,6 +557,10 @@ function cdp_cal_final_total() {
 
     // calculate weight columetric box size
     var total_metric = (length * width * height) / core_meter;
+    
+    // Calculate CBM (Cubic Meter)
+    var cbm = (length * width * height) / 1000000;
+    sumador_cbm += cbm;
 
     sumador_libras += weight; //Sumador
     sumador_volumetric += total_metric; //Sumador
@@ -613,6 +618,9 @@ function cdp_cal_final_total() {
   $("#total_libras").html(sumador_libras.toFixed(2));
 
   $("#total_volumetrico").html(sumador_volumetric.toFixed(2));
+  
+  $("#total_cbm").html(sumador_cbm.toFixed(4)); // NEW: Display total CBM
+  $("#total_cbm_input").val(sumador_cbm.toFixed(4)); // NEW: Store CBM value
 
   $("#total_peso").html(total_peso.toFixed(2));
   $("#total_weight_input").val(total_peso.toFixed(2));

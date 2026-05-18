@@ -59,7 +59,7 @@ $adjacents  = 4; //gap between pages after number of adjacents
 $offset = ($page - 1) * $per_page;
 
 
-$sql = "SELECT   a.status_invoice, a.total_order, a.consolidate_id , a.c_prefix, a.c_no, a.c_date, a.sender_id, a.receiver_id, a.order_courier, a.order_pay_mode, a.status_courier, a.driver_id, a.order_service_options,  b.mod_style, b.color FROM cdb_consolidate as a
+$sql = "SELECT   a.status_invoice, a.total_order, a.total_cbm, a.consolidate_id , a.c_prefix, a.c_no, a.c_date, a.sender_id, a.receiver_id, a.order_courier, a.order_pay_mode, a.status_courier, a.driver_id, a.order_service_options,  b.mod_style, b.color FROM cdb_consolidate as a
 			 INNER JOIN cdb_styles as b ON a.status_courier = b.id
 			 $sWhere
 			  and a.status_courier!=14
@@ -103,6 +103,7 @@ if ($numrows > 0) { ?>
 					<th class="text-center"><b><?php echo $lang['lorigin'] ?></b></th>
 					<th class="text-center"><b><?php echo $lang['ldestination'] ?></b></th>
 					<th><b><?php echo $lang['left533020007'] ?></b></th>
+					<th class="text-center"><b>CBM (m³)</b></th>
 					<th class=""><b><?php echo $lang['ship-all5'] ?></b></th>
 					<th class="text-center"><b></b></th>
 					<th class="text-center"><b><?php echo $lang['lstatusshipment'] ?></b></th>
@@ -204,6 +205,7 @@ if ($numrows > 0) { ?>
 								if ($driver_data != null) {
 									echo $driver_data->fname; ?> <?php echo $driver_data->lname;
 																} ?></td>
+							<td class="text-center"><?php echo number_format($row->total_cbm, 4); ?></td>
 							<td class="text-center">
 								<b><?php echo $core->currency; ?></b> <?php echo cdb_money_format($row->total_order); ?>
 							</td>

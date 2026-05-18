@@ -377,6 +377,12 @@
         </tr>
 
         <tr>
+            <td style=" border: 1px solid black; padding: 3px; width: 50%;"><b>Total CBM:</b> <span id="total_cbm"><?php echo number_format($row->total_cbm, 4); ?> m³</span></td>
+            <td style=" border: 1px solid black; padding: 3px; width: 25%;" class="text-right"></td>
+            <td style=" border: 1px solid black; padding: 3px; width: 25%;" class="text-center"></td>
+        </tr>
+
+        <tr>
             <td style=" border: 1px solid black; padding: 3px; width: 50%;"></td>
 
             <td style=" border: 1px solid black; padding: 3px; width: 25%;" class="text-right"><b>Re expedition</b></td>
