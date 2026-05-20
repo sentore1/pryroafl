@@ -12,6 +12,7 @@ var packagesItems = [
     weight: 0,
     declared_value: 0,
     fixed_value: 0,
+    cbm_value: 0,
   },
 ];
 
@@ -310,6 +311,11 @@ $("input[type=file]").on("change", function () {
 
 function loadPackages() {
   $("#data_items").html("");
+  
+  // Get settings
+  var show_dimensions = $("#show_package_dimensions").val() == "1";
+  var show_cbm_input = $("#show_cbm_input_field").val() == "1";
+  
   packagesItems.forEach(function (item, index) {
     var html_code = "";
     html_code += '<div  class= "card-hover" id="row_id_' + index + '">';
@@ -369,74 +375,103 @@ function loadPackages() {
       "</div>" +
       "</div>";
 
-    html_code +=
-      '<div class="col-sm-12 col-md-6 col-lg-1">' +
-      '<div class="form-group">' +
-      '<label for="emailAddress1"> ' +
-      translate_length +
-      "</label>" +
-      '<div class="input-group">' +
-      '<input type="text" onchange="changePackage(this)" value="' +
-      item.length +
-      '" onkeypress="return isNumberKey(event, this)" name="length" id="length_' +
-      index +
-      '" class="form-control input-sm text_only" data-toggle="tooltip" data-placement="bottom" title="' +
-      translate_length +
-      '"/>' +
-      "</div>" +
-      "</div>" +
-      "</div>";
-    html_code +=
-      '<div class="col-sm-12 col-md-6 col-lg-1">' +
-      '<div class="form-group">' +
-      '<label for="emailAddress1"> ' +
-      translate_width +
-      "</label>" +
-      '<div class="input-group">' +
-      '<input type="text" onchange="changePackage(this)" value="' +
-      item.width +
-      '" onkeypress="return isNumberKey(event, this)" name="width" id="width_' +
-      index +
-      '" class="form-control input-sm text_only" data-toggle="tooltip" data-placement="bottom" title="' +
-      translate_width +
-      '"/>' +
-      "</div>" +
-      "</div>" +
-      "</div>";
+    // Conditionally show dimension fields
+    if (show_dimensions) {
+      html_code +=
+        '<div class="col-sm-12 col-md-6 col-lg-1">' +
+        '<div class="form-group">' +
+        '<label for="emailAddress1"> ' +
+        translate_length +
+        "</label>" +
+        '<div class="input-group">' +
+        '<input type="text" onchange="changePackage(this)" value="' +
+        item.length +
+        '" onkeypress="return isNumberKey(event, this)" name="length" id="length_' +
+        index +
+        '" class="form-control input-sm text_only" data-toggle="tooltip" data-placement="bottom" title="' +
+        translate_length +
+        '"/>' +
+        "</div>" +
+        "</div>" +
+        "</div>";
+      html_code +=
+        '<div class="col-sm-12 col-md-6 col-lg-1">' +
+        '<div class="form-group">' +
+        '<label for="emailAddress1"> ' +
+        translate_width +
+        "</label>" +
+        '<div class="input-group">' +
+        '<input type="text" onchange="changePackage(this)" value="' +
+        item.width +
+        '" onkeypress="return isNumberKey(event, this)" name="width" id="width_' +
+        index +
+        '" class="form-control input-sm text_only" data-toggle="tooltip" data-placement="bottom" title="' +
+        translate_width +
+        '"/>' +
+        "</div>" +
+        "</div>" +
+        "</div>";
 
-    html_code +=
-      '<div class="col-sm-12 col-md-6 col-lg-1">' +
-      '<div class="form-group">' +
-      '<label for="emailAddress1"> ' +
-      translate_height +
-      "</label>" +
-      '<div class="input-group">' +
-      '<input type="text" onchange="changePackage(this)" value="' +
-      item.height +
-      '" onkeypress="return isNumberKey(event, this)"  name="height" id="height_' +
-      index +
-      '" class="form-control input-sm number_only" data-toggle="tooltip" data-placement="bottom" title="' +
-      translate_height +
-      '" />' +
-      "</div>" +
-      "</div>" +
-      "</div>";
+      html_code +=
+        '<div class="col-sm-12 col-md-6 col-lg-1">' +
+        '<div class="form-group">' +
+        '<label for="emailAddress1"> ' +
+        translate_height +
+        "</label>" +
+        '<div class="input-group">' +
+        '<input type="text" onchange="changePackage(this)" value="' +
+        item.height +
+        '" onkeypress="return isNumberKey(event, this)"  name="height" id="height_' +
+        index +
+        '" class="form-control input-sm number_only" data-toggle="tooltip" data-placement="bottom" title="' +
+        translate_height +
+        '" />' +
+        "</div>" +
+        "</div>" +
+        "</div>";
 
-    html_code +=
-      '<div class="col-sm-12 col-md-6 col-lg-1">' +
-      '<div class="form-group">' +
-      '<label for="emailAddress1"> ' +
-      translate_volweight +
-      "</label>" +
-      '<div class="input-group">' +
-      '<input type="text" readonly value="0" onkeypress="return isNumberKey(event, this)"  name="weightVol" id="weightVol_' +
-      index +
-      '" class="form-control input-sm number_only" data-toggle="tooltip" data-placement="bottom" title="' +
-      translate_volweight +
-      '" />' +
-      "</div>" +
-      "</div>" +
-      "</div>";
+      html_code +=
+        '<div class="col-sm-12 col-md-6 col-lg-1">' +
+        '<div class="form-group">' +
+        '<label for="emailAddress1"> ' +
+        translate_volweight +
+        "</label>" +
+        '<div class="input-group">' +
+        '<input type="text" readonly value="0" onkeypress="return isNumberKey(event, this)"  name="weightVol" id="weightVol_' +
+        index +
+        '" class="form-control input-sm number_only" data-toggle="tooltip" data-placement="bottom" title="' +
+        translate_volweight +
+        '" />' +
+        "</div>" +
+        "</div>" +
+        "</div>";
+    } else {
+      // Hidden fields to maintain data structure
+      html_code += '<input type="hidden" name="length" id="length_' + index + '" value="' + (item.length || 0) + '" />';
+      html_code += '<input type="hidden" name="width" id="width_' + index + '" value="' + (item.width || 0) + '" />';
+      html_code += '<input type="hidden" name="height" id="height_' + index + '" value="' + (item.height || 0) + '" />';
+      html_code += '<input type="hidden" name="weightVol" id="weightVol_' + index + '" value="0" />';
+    }
+
+    // Conditionally show CBM input field
+    if (show_cbm_input) {
+      html_code +=
+        '<div class="col-sm-12 col-md-6 col-lg-1">' +
+        '<div class="form-group">' +
+        '<label for="emailAddress1">CBM (m³)</label>' +
+        '<div class="input-group">' +
+        '<input type="text" onchange="changePackage(this)" value="' +
+        (item.cbm_value || 0) +
+        '" onkeypress="return isNumberKey(event, this)" name="cbm_value" id="cbm_value_' +
+        index +
+        '" class="form-control input-sm" data-toggle="tooltip" data-placement="bottom" title="CBM (Cubic Meter)" style="border: 1px solid #36bea6;"/>' +
+        "</div>" +
+        "</div>" +
+        "</div>";
+    } else {
+      // Hidden field to maintain data structure
+      html_code += '<input type="hidden" name="cbm_value" id="cbm_value_' + index + '" value="' + (item.cbm_value || 0) + '" />';
+    }
 
     html_code +=
       '<div class="col-sm-12 col-md-6 col-lg-1">' +
@@ -504,6 +539,7 @@ function addPackage() {
     weight: 0,
     declared_value: 0,
     fixed_value: 0,
+    cbm_value: 0,
   });
 
   var index = packagesItems.length - 1;
@@ -601,24 +637,42 @@ function calculateFinalTotal(element = null) {
 
   // Check if auto calculation is selected
   var tariff_mode = $("#tariff_mode").is(":checked");
+  
+  // Get settings
+  var show_dimensions = $("#show_package_dimensions").val() == "1";
+  var show_cbm_input = $("#show_cbm_input_field").val() == "1";
 
   packagesItems.forEach(function (item, i) {
     var weight = parseFloat(item.weight);
-    var length = parseFloat(item.length);
-    var width = parseFloat(item.width);
-    var height = parseFloat(item.height);
+    var length = parseFloat(item.length) || 0;
+    var width = parseFloat(item.width) || 0;
+    var height = parseFloat(item.height) || 0;
     var fixed_value = parseFloat(item.fixed_value);
     var declared_value = parseFloat(item.declared_value);
+    var cbm_input = parseFloat(item.cbm_value) || 0;
 
-    var total_metric = (length * width * height) / core_meter;
+    var total_metric = 0;
+    var cbm = 0;
+    
+    // Calculate based on available input
+    if (show_cbm_input && cbm_input > 0) {
+      // Use CBM input directly
+      cbm = cbm_input;
+      // Calculate volumetric weight from CBM if needed
+      // Assuming 1 CBM = core_meter kg (you may need to adjust this conversion)
+      total_metric = cbm * 1000000 / core_meter;
+    } else if (show_dimensions && length > 0 && width > 0 && height > 0) {
+      // Calculate from dimensions
+      total_metric = (length * width * height) / core_meter;
+      cbm = (length * width * height) / 1000000;
+    }
+    
     total_metric = parseFloat(total_metric);
+    cbm = parseFloat(cbm);
 
     $("#weightVol_" + i).val(total_metric.toFixed(2));
     
-    // Calculate CBM (Cubic Meter)
-    var cbm = (length * width * height) / 1000000;
     sumador_cbm += cbm;
-
     sumador_libras += weight;
     sumador_volumetric += total_metric;
 
@@ -697,6 +751,10 @@ $("#invoice_form").on("submit", function (event) {
     return false;
   }
 
+  // Get settings
+  var show_dimensions = $("#show_package_dimensions").val() == "1";
+  var show_cbm_input = $("#show_cbm_input_field").val() == "1";
+
   // sweealert 2, alerta error informacion de paquetes
 
   for (let [i, val] of packagesItems.entries()) {
@@ -730,36 +788,55 @@ $("#invoice_form").on("submit", function (event) {
       $("#weight_" + i).focus();
       return false;
     }
-    if ($.trim($("#length_" + i).val()).length == 0) {
-      Swal.fire({
-        type: "Error!",
-        text: validation_length,
-        icon: "error",
-        confirmButtonText: "Ok",
-      });
-      $("#length_" + i).focus();
-      return false;
+    
+    // Validate dimensions only if dimensions are shown
+    if (show_dimensions) {
+      if ($.trim($("#length_" + i).val()).length == 0) {
+        Swal.fire({
+          type: "Error!",
+          text: validation_length,
+          icon: "error",
+          confirmButtonText: "Ok",
+        });
+        $("#length_" + i).focus();
+        return false;
+      }
+      if ($.trim($("#width_" + i).val()).length == 0) {
+        Swal.fire({
+          type: "Error!",
+          text: validation_width,
+          icon: "error",
+          confirmButtonText: "Ok",
+        });
+        $("#width_" + i).focus();
+        return false;
+      }
+      if ($.trim($("#height_" + i).val()).length == 0) {
+        Swal.fire({
+          type: "Error!",
+          text: validation_height,
+          icon: "error",
+          confirmButtonText: "Ok",
+        });
+        $("#height_" + i).focus();
+        return false;
+      }
     }
-    if ($.trim($("#width_" + i).val()).length == 0) {
-      Swal.fire({
-        type: "Error!",
-        text: validation_width,
-        icon: "error",
-        confirmButtonText: "Ok",
-      });
-      $("#width_" + i).focus();
-      return false;
+    
+    // Validate CBM only if CBM input is shown and dimensions are not provided
+    if (show_cbm_input && !show_dimensions) {
+      if ($.trim($("#cbm_value_" + i).val()).length == 0 || parseFloat($("#cbm_value_" + i).val()) == 0) {
+        Swal.fire({
+          type: "Error!",
+          text: "Please enter CBM value",
+          icon: "error",
+          confirmButtonText: "Ok",
+        });
+        $("#cbm_value_" + i).focus();
+        return false;
+      }
     }
-    if ($.trim($("#height_" + i).val()).length == 0) {
-      Swal.fire({
-        type: "Error!",
-        text: validation_height,
-        icon: "error",
-        confirmButtonText: "Ok",
-      });
-      $("#height_" + i).focus();
-      return false;
-    }
+    
     if ($.trim($("#fixedValue_" + i).val()).length == 0) {
       Swal.fire({
         type: "Error!",

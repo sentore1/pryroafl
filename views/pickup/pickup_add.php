@@ -632,6 +632,10 @@ $userData = $user->cdp_getUserData();
                             <input type="hidden" name="core_meter" id="core_meter" value="<?php echo $core->meter; ?>" />
                             <input type="hidden" name="core_min_cost_tax" id="core_min_cost_tax" value="<?php echo $core->min_cost_tax; ?>" />
                             <input type="hidden" name="core_min_cost_declared_tax" id="core_min_cost_declared_tax" value="<?php echo $core->min_cost_declared_tax; ?>" />
+                            
+                            <!-- CBM Settings -->
+                            <input type="hidden" name="show_package_dimensions" id="show_package_dimensions" value="<?php echo $core->show_package_dimensions ?? 1; ?>" />
+                            <input type="hidden" name="show_cbm_input_field" id="show_cbm_input_field" value="<?php echo $core->show_cbm_input_field ?? 0; ?>" />
                         </div>
                     </div>
             </form>

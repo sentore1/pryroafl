@@ -1,0 +1,118 @@
+2026-05-20 18:27:14
+POST Data:
+Array
+(
+    [show_package_dimensions] => 1
+    [show_cbm_in_forms] => 1
+    [cbm_rate] => 50.00
+    [cbm_priority] => higher
+    [cbm_measurement_unit] => cm
+)
+
+---
+
+2026-05-20 18:27:32
+POST Data:
+Array
+(
+    [show_package_dimensions] => 1
+    [cbm_rate] => 50.00
+    [cbm_priority] => higher
+    [cbm_measurement_unit] => cm
+)
+
+---
+
+2026-05-20 18:27:42
+POST Data:
+Array
+(
+    [cbm_rate] => 50.00
+    [cbm_priority] => higher
+    [cbm_measurement_unit] => cm
+)
+
+---
+
+2026-05-20 18:27:55
+POST Data:
+Array
+(
+    [cbm_enabled] => 1
+    [show_cbm_input_field] => 1
+    [show_cbm_in_forms] => 1
+    [cbm_rate] => 50.00
+    [cbm_priority] => higher
+    [cbm_measurement_unit] => cm
+)
+
+---
+
+2026-05-20 18:31:32
+POST Data:
+Array
+(
+    [cbm_enabled] => 1
+    [cbm_rate] => 50
+    [cbm_priority] => higher
+    [cbm_measurement_unit] => cm
+    [show_package_dimensions] => 1
+    [show_cbm_input_field] => 0
+    [show_cbm_in_forms] => 1
+)
+
+---
+
+2026-05-20 18:35:57
+POST Data:
+Array
+(
+    [cbm_enabled] => 1
+    [show_cbm_input_field] => 1
+    [show_cbm_in_forms] => 1
+    [cbm_rate] => 50
+    [cbm_priority] => higher
+    [cbm_measurement_unit] => cm
+)
+
+---
+
+2026-05-20 18:36:25
+POST Data:
+Array
+(
+    [show_package_dimensions] => 1
+    [cbm_rate] => 50
+    [cbm_priority] => higher
+    [cbm_measurement_unit] => cm
+)
+
+---
+
+2026-05-20 18:36:37
+POST Data:
+Array
+(
+    [show_package_dimensions] => 1
+    [cbm_rate] => 50
+    [cbm_priority] => higher
+    [cbm_measurement_unit] => cm
+)
+
+---
+
+2026-05-20 18:36:49
+POST Data:
+Array
+(
+    [cbm_enabled] => 1
+    [show_package_dimensions] => 1
+    [show_cbm_input_field] => 1
+    [show_cbm_in_forms] => 1
+    [cbm_rate] => 50
+    [cbm_priority] => higher
+    [cbm_measurement_unit] => cm
+)
+
+---
+

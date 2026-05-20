@@ -143,6 +143,7 @@ class Core
   public $cbm_measurement_unit;
   public $show_package_dimensions;
   public $show_cbm_in_forms;
+  public $show_cbm_input_field;
 
   function __construct()
   {
@@ -276,6 +277,7 @@ class Core
     $this->cbm_measurement_unit = $settings->cbm_measurement_unit ?? 'cm';
     $this->show_package_dimensions = $settings->show_package_dimensions ?? 1;
     $this->show_cbm_in_forms = $settings->show_cbm_in_forms ?? 1;
+    $this->show_cbm_input_field = $settings->show_cbm_input_field ?? 0;
 
 
 

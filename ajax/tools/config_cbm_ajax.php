@@ -33,6 +33,7 @@ if ($user->cdp_is_Admin()) {
     $cbm_priority = cdp_sanitize($_POST['cbm_priority']);
     $cbm_measurement_unit = cdp_sanitize($_POST['cbm_measurement_unit']);
     $show_package_dimensions = isset($_POST['show_package_dimensions']) ? 1 : 0;
+    $show_cbm_input_field = isset($_POST['show_cbm_input_field']) ? 1 : 0;
     $show_cbm_in_forms = isset($_POST['show_cbm_in_forms']) ? 1 : 0;
 
     // Validate inputs
@@ -46,6 +47,11 @@ if ($user->cdp_is_Admin()) {
 
     if (!in_array($cbm_measurement_unit, ['cm', 'inch', 'm'])) {
         $errors['cbm_measurement_unit'] = 'Invalid measurement unit selected';
+    }
+
+    // Validate that at least one input method is enabled
+    if ($show_package_dimensions == 0 && $show_cbm_input_field == 0) {
+        $errors['input_method'] = 'At least one input method (Dimensions or CBM) must be enabled';
     }
 
     // If no errors, update settings
@@ -66,6 +72,10 @@ if ($user->cdp_is_Admin()) {
         $db->cdp_execute();
         $has_show_cbm = $db->cdp_rowCount() > 0;
         
+        $db->cdp_query("SHOW COLUMNS FROM cdb_settings LIKE 'show_cbm_input_field'");
+        $db->cdp_execute();
+        $has_cbm_input = $db->cdp_rowCount() > 0;
+        
         // Build UPDATE query based on available columns
         $update_fields = array(
             'cbm_calculation_enabled = :enabled',
@@ -81,6 +91,9 @@ if ($user->cdp_is_Admin()) {
         }
         if ($has_show_cbm) {
             $update_fields[] = 'show_cbm_in_forms = :show_cbm';
+        }
+        if ($has_cbm_input) {
+            $update_fields[] = 'show_cbm_input_field = :cbm_input';
         }
         
         $sql = "UPDATE cdb_settings SET " . implode(', ', $update_fields) . " WHERE id = 1";
@@ -99,13 +112,16 @@ if ($user->cdp_is_Admin()) {
         if ($has_show_cbm) {
             $db->bind(':show_cbm', $show_cbm_in_forms);
         }
+        if ($has_cbm_input) {
+            $db->bind(':cbm_input', $show_cbm_input_field);
+        }
         
         if ($db->cdp_execute()) {
             
             $message = 'CBM settings saved successfully!';
             
             // Warn if new columns don't exist
-            if (!$has_unit_column || !$has_show_dims || !$has_show_cbm) {
+            if (!$has_unit_column || !$has_show_dims || !$has_show_cbm || !$has_cbm_input) {
                 $message .= ' Note: Run database migration to enable all features.';
             }
             

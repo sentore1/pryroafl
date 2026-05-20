@@ -181,6 +181,7 @@ $code_currency = $core->cdp_getCodeCountries();
     <script src="dataJs/configlogo.js"></script>
     <script src="dataJs/config_email.js"></script>
     <script src="dataJs/whatssap_config.js"></script>
+    <script src="dataJs/config_cbm.js"></script>
 
 </body>
 
