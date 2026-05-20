@@ -620,11 +620,11 @@ $lang = array(
 	"left-menu-sidebar-4" => "All submissions",
 
 
-	"left-menu-sidebar-5" => "Locker packages",
+	"left-menu-sidebar-5" => "Warehouse",
 	"left-menu-sidebar-6" => "Packages Control Panel",
 	"left-menu-sidebar-7" => "Pre-Alert List",
-	"left-menu-sidebar-8" => "Register packages",
-	"left-menu-sidebar-9" => "register multiple packages",
+	"left-menu-sidebar-8" => "Receive Package",
+	"left-menu-sidebar-9" => "Receive Multiple Packages",
 	"left-menu-sidebar-10" => "Create Pre Alert",
 	"left-menu-sidebar-11" => "List of packages",
 	"left-menu-sidebar-12" => "List of payments",
@@ -637,7 +637,7 @@ $lang = array(
 	"left-menu-sidebar-17" => "Create multiple shipment",
 
 
-	"left-menu-sidebar-18" => "Pickups",
+	"left-menu-sidebar-18" => "Collections",
 	"left-menu-sidebar-19" => "Collection Control Panel",
 	"left-menu-sidebar-20" => "Create Pickup",
 	"left-menu-sidebar-21" => "Pickup List",

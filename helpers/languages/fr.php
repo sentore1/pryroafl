@@ -614,11 +614,11 @@ $lang = array(
 	"left-menu-sidebar-3" => "Gestion des applications",
 	"left-menu-sidebar-4" => "Toutes les soumissions",
 
-	"left-menu-sidebar-5" => "Achat en ligne",
+	"left-menu-sidebar-5" => "Entrepôt",
 	"left-menu-sidebar-6" => "Panneau de contrôle des paquets",
 	"left-menu-sidebar-7" => "Liste de pré-alerte",
-	"left-menu-sidebar-8" => "Enregistrer des colis",
-	"left-menu-sidebar-9" => "enregistrer plusieurs colis",
+	"left-menu-sidebar-8" => "Recevoir un colis",
+	"left-menu-sidebar-9" => "Recevoir plusieurs colis",
 	"left-menu-sidebar-10" => "Créer une pré-alerte",
 	"left-menu-sidebar-11" => "Liste de colis",
 	"left-menu-sidebar-12" => "Liste des paiements",
@@ -629,7 +629,7 @@ $lang = array(
 	"left-menu-sidebar-16" => "Liste des expéditions",
 	"left-menu-sidebar-17" => "Créer plusieurs expéditions",
 
-	"left-menu-sidebar-18" => "Ramassages",
+	"left-menu-sidebar-18" => "Collections",
 	"left-menu-sidebar-19" => "Panneau de contrôle de collecte",
 	"left-menu-sidebar-20" => "Créer un enlèvement",
 	"left-menu-sidebar-21" => "Liste de ramassage",
