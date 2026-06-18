@@ -1,6 +1,7 @@
 ﻿<?php
 header('Content-Type: application/json');
 require_once("../../loader.php");
+require_once("ai_permissions_helper.php");
 
 $user = new User;
 if (!$user->cdp_is_Admin()) {
@@ -13,6 +14,7 @@ $history_json = isset($_POST['history'])  ? $_POST['history']        : '[]';
 $history      = json_decode($history_json, true) ?: [];
 
 $db = new Conexion;
+$perms = new AIPermissions();
 $context = [];
 
 // --- Stuck shipments with order_id for actions ---
@@ -160,10 +162,22 @@ if ($settings_row) {
 }
 
 $context_json = json_encode($context, JSON_PRETTY_PRINT);
+$permissions_summary = $perms->getPermissionsSummary();
+$autopilot_mode = $perms->isAutopilotEnabled();
+$autopilot_threshold = $perms->getAutopilotThreshold();
 
 // ------------------------------------------------------------------
 // SYSTEM PROMPT
 // ------------------------------------------------------------------
+$autopilot_instructions = $autopilot_mode ? "
+AUTOPILOT MODE IS ENABLED:
+You can automatically take LOW-RISK actions when you detect issues that exceed the threshold of {$autopilot_threshold} items:
+- Automatically assign drivers to unassigned shipments if there are {$autopilot_threshold}+ unassigned
+- Automatically mark stuck shipments as 'In Transit' if there are {$autopilot_threshold}+ stuck
+- When in autopilot, include AUTO_ACTION tag in your response
+HIGH-RISK actions (cancellations, refunds, bulk payment confirmations) ALWAYS require manual confirmation even in autopilot mode.
+" : "AUTOPILOT MODE IS DISABLED: All actions require manual confirmation via action buttons.";
+
 $system_prompt = <<<PROMPT
 You are Pryro AI, an intelligent operations assistant for a shipping and logistics company called Pryro.
 You have access to live system data and help the admin manage shipments, drivers, payments, and customers.
@@ -171,13 +185,22 @@ Be concise, direct, and actionable. Use bullet points when listing items.
 Always refer to specific tracking numbers, customer names, and amounts from the data when relevant.
 Always use "{$currency}" as the currency symbol. Never use dollar sign or any other currency.
 
+{$autopilot_instructions}
+
+PERMISSIONS:
+{$permissions_summary}
+
 IMPORTANT - ACTION BUTTONS:
 Only append ACTIONS_JSON if the data contains real items that need action. NEVER include an action if the data shows 0 items or empty arrays for that category.
+Always check your permissions before suggesting actions. If you don't have permission for an action, explain to the user that they need to enable it in AI Settings.
 
 Specific rules:
-- Add "confirm_payment" button ONLY if pending_payments OR overdue_invoices array has items with actual order_id values
-- Add "confirm_all_wire_payments" button ONLY if overdue_invoices array has 2 or more items
-- Add "update_status" button ONLY if stuck_shipments array has items with actual order_id values
+- Add "confirm_payment" button ONLY if pending_payments OR overdue_invoices array has items with actual order_id values AND you have ai_can_confirm_payments permission
+- Add "confirm_all_wire_payments" button ONLY if overdue_invoices array has 2 or more items AND you have ai_can_confirm_payments permission
+- Add "update_status" button ONLY if stuck_shipments array has items with actual order_id values AND you have ai_can_update_status permission
+- Add "send_sms" button ONLY if you have ai_can_send_sms permission
+- Add "send_email" button ONLY if you have ai_can_send_email permission
+- Add "send_whatsapp" button ONLY if you have ai_can_send_whatsapp permission
 - If everything is fine and no action is needed, do NOT include ACTIONS_JSON at all
 
 When actions exist, append at the very end on one line:

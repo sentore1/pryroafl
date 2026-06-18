@@ -9,7 +9,7 @@
 <?php
 // Load current AI config from database
 $ai_db = new Conexion;
-$ai_db->cdp_query("SELECT ai_provider, groq_api_key, openai_api_key FROM cdb_settings LIMIT 1");
+$ai_db->cdp_query("SELECT * FROM cdb_settings LIMIT 1");
 $ai_db->cdp_execute();
 $ai_row = $ai_db->cdp_registro();
 
@@ -17,6 +17,11 @@ $current_groq     = ($ai_row && !empty($ai_row->groq_api_key))   ? $ai_row->groq
 $current_openai   = ($ai_row && !empty($ai_row->openai_api_key)) ? $ai_row->openai_api_key : '';
 $current_provider = ($ai_row && !empty($ai_row->ai_provider))    ? $ai_row->ai_provider    : 'groq';
 $is_active        = !empty($current_groq) || !empty($current_openai);
+
+// Helper function to get permission value
+function ai_perm($row, $field, $default = 0) {
+    return (isset($row->$field) && $row->$field !== null) ? (int)$row->$field : $default;
+}
 ?>
 
     <div class="bg-light p-15">
@@ -108,10 +113,256 @@ $is_active        = !empty($current_groq) || !empty($current_openai);
                         </div>
                     </section>
 
-                    <div class="form-group">
+                    <!-- AUTOPILOT MODE SECTION -->
+                    <section class="mt-4">
+                        <h4 class="card-title"><b><i class="mdi mdi-airplane"></i> Autopilot Mode</b></h4>
+                        <p class="text-muted" style="font-size:13px;">When enabled, P-AI can automatically take actions without asking for confirmation when it detects issues that meet the threshold criteria.</p>
+                        <hr />
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <div class="custom-control custom-switch">
+                                        <input type="checkbox" class="custom-control-input" id="ai_autopilot_enabled" name="ai_autopilot_enabled" value="1" <?php echo ai_perm($ai_row, 'ai_autopilot_enabled') ? 'checked' : ''; ?>>
+                                        <label class="custom-control-label" for="ai_autopilot_enabled">
+                                            <strong>Enable Autopilot Mode</strong>
+                                            <span class="badge badge-warning ml-2">EXPERIMENTAL</span>
+                                        </label>
+                                    </div>
+                                    <small class="text-muted d-block mt-2">AI will automatically assign drivers, confirm obvious payments, and update stuck shipments</small>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>Autopilot Threshold (minimum items before auto-action)</label>
+                                    <select class="form-control" name="ai_autopilot_threshold" id="ai_autopilot_threshold">
+                                        <?php 
+                                        $threshold = ai_perm($ai_row, 'ai_autopilot_threshold', 5);
+                                        for ($i = 1; $i <= 20; $i++) {
+                                            $selected = ($threshold == $i) ? 'selected' : '';
+                                            echo "<option value='$i' $selected>$i items</option>";
+                                        }
+                                        ?>
+                                    </select>
+                                    <small class="text-muted">AI will only auto-act if there are at least this many items</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="alert alert-info" style="font-size:12px;">
+                            <i class="mdi mdi-information"></i> <strong>Autopilot Safety:</strong> AI will only auto-act on low-risk operations (assigning drivers to unassigned shipments, marking stuck shipments as "in transit"). High-risk actions (cancellations, refunds) always require manual confirmation.
+                        </div>
+                    </section>
+
+                    <!-- READ PERMISSIONS SECTION -->
+                    <section class="mt-4">
+                        <h4 class="card-title"><b><i class="mdi mdi-book-open-variant"></i> Read Permissions</b></h4>
+                        <p class="text-muted" style="font-size:13px;">Control what data P-AI can see and analyze.</p>
+                        <hr />
+
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="custom-control custom-switch mb-3">
+                                    <input type="checkbox" class="custom-control-input" id="ai_can_read_customers" name="ai_can_read_customers" value="1" <?php echo ai_perm($ai_row, 'ai_can_read_customers', 1) ? 'checked' : ''; ?>>
+                                    <label class="custom-control-label" for="ai_can_read_customers">Customer Data</label>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="custom-control custom-switch mb-3">
+                                    <input type="checkbox" class="custom-control-input" id="ai_can_read_packages" name="ai_can_read_packages" value="1" <?php echo ai_perm($ai_row, 'ai_can_read_packages', 1) ? 'checked' : ''; ?>>
+                                    <label class="custom-control-label" for="ai_can_read_packages">Package Details</label>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="custom-control custom-switch mb-3">
+                                    <input type="checkbox" class="custom-control-input" id="ai_can_read_financials" name="ai_can_read_financials" value="1" <?php echo ai_perm($ai_row, 'ai_can_read_financials', 1) ? 'checked' : ''; ?>>
+                                    <label class="custom-control-label" for="ai_can_read_financials">Financial Data</label>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="custom-control custom-switch mb-3">
+                                    <input type="checkbox" class="custom-control-input" id="ai_can_read_drivers" name="ai_can_read_drivers" value="1" <?php echo ai_perm($ai_row, 'ai_can_read_drivers', 1) ? 'checked' : ''; ?>>
+                                    <label class="custom-control-label" for="ai_can_read_drivers">Driver Information</label>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="custom-control custom-switch mb-3">
+                                    <input type="checkbox" class="custom-control-input" id="ai_can_read_inventory" name="ai_can_read_inventory" value="1" <?php echo ai_perm($ai_row, 'ai_can_read_inventory', 0) ? 'checked' : ''; ?>>
+                                    <label class="custom-control-label" for="ai_can_read_inventory">Inventory Data</label>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- ACTION PERMISSIONS SECTION -->
+                    <section class="mt-4">
+                        <h4 class="card-title"><b><i class="mdi mdi-lightning-bolt"></i> Action Permissions</b></h4>
+                        <p class="text-muted" style="font-size:13px;">Control what actions P-AI can perform on your data.</p>
+                        <hr />
+
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="custom-control custom-switch mb-3">
+                                    <input type="checkbox" class="custom-control-input" id="ai_can_assign_drivers" name="ai_can_assign_drivers" value="1" <?php echo ai_perm($ai_row, 'ai_can_assign_drivers', 1) ? 'checked' : ''; ?>>
+                                    <label class="custom-control-label" for="ai_can_assign_drivers">Assign Drivers</label>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="custom-control custom-switch mb-3">
+                                    <input type="checkbox" class="custom-control-input" id="ai_can_confirm_payments" name="ai_can_confirm_payments" value="1" <?php echo ai_perm($ai_row, 'ai_can_confirm_payments', 1) ? 'checked' : ''; ?>>
+                                    <label class="custom-control-label" for="ai_can_confirm_payments">Confirm Payments</label>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="custom-control custom-switch mb-3">
+                                    <input type="checkbox" class="custom-control-input" id="ai_can_update_status" name="ai_can_update_status" value="1" <?php echo ai_perm($ai_row, 'ai_can_update_status', 1) ? 'checked' : ''; ?>>
+                                    <label class="custom-control-label" for="ai_can_update_status">Update Status</label>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="custom-control custom-switch mb-3">
+                                    <input type="checkbox" class="custom-control-input" id="ai_can_create_shipments" name="ai_can_create_shipments" value="1" <?php echo ai_perm($ai_row, 'ai_can_create_shipments', 0) ? 'checked' : ''; ?>>
+                                    <label class="custom-control-label" for="ai_can_create_shipments">Create Shipments <span class="badge badge-primary badge-sm">NEW</span></label>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="custom-control custom-switch mb-3">
+                                    <input type="checkbox" class="custom-control-input" id="ai_can_edit_shipments" name="ai_can_edit_shipments" value="1" <?php echo ai_perm($ai_row, 'ai_can_edit_shipments', 0) ? 'checked' : ''; ?>>
+                                    <label class="custom-control-label" for="ai_can_edit_shipments">Edit Shipments <span class="badge badge-primary badge-sm">NEW</span></label>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="custom-control custom-switch mb-3">
+                                    <input type="checkbox" class="custom-control-input" id="ai_can_cancel_shipments" name="ai_can_cancel_shipments" value="1" <?php echo ai_perm($ai_row, 'ai_can_cancel_shipments', 0) ? 'checked' : ''; ?>>
+                                    <label class="custom-control-label" for="ai_can_cancel_shipments">Cancel Shipments</label>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- COMMUNICATION PERMISSIONS SECTION -->
+                    <section class="mt-4">
+                        <h4 class="card-title"><b><i class="mdi mdi-message-text"></i> Communication Permissions</b></h4>
+                        <p class="text-muted" style="font-size:13px;">Allow P-AI to send notifications to customers and staff.</p>
+                        <hr />
+
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="custom-control custom-switch mb-3">
+                                    <input type="checkbox" class="custom-control-input" id="ai_can_send_sms" name="ai_can_send_sms" value="1" <?php echo ai_perm($ai_row, 'ai_can_send_sms', 0) ? 'checked' : ''; ?>>
+                                    <label class="custom-control-label" for="ai_can_send_sms">Send SMS <span class="badge badge-primary badge-sm">NEW</span></label>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="custom-control custom-switch mb-3">
+                                    <input type="checkbox" class="custom-control-input" id="ai_can_send_email" name="ai_can_send_email" value="1" <?php echo ai_perm($ai_row, 'ai_can_send_email', 0) ? 'checked' : ''; ?>>
+                                    <label class="custom-control-label" for="ai_can_send_email">Send Email <span class="badge badge-primary badge-sm">NEW</span></label>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="custom-control custom-switch mb-3">
+                                    <input type="checkbox" class="custom-control-input" id="ai_can_send_whatsapp" name="ai_can_send_whatsapp" value="1" <?php echo ai_perm($ai_row, 'ai_can_send_whatsapp', 0) ? 'checked' : ''; ?>>
+                                    <label class="custom-control-label" for="ai_can_send_whatsapp">Send WhatsApp <span class="badge badge-primary badge-sm">NEW</span></label>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- REPORTING PERMISSIONS SECTION -->
+                    <section class="mt-4">
+                        <h4 class="card-title"><b><i class="mdi mdi-file-chart"></i> Reporting & Export Permissions</b></h4>
+                        <p class="text-muted" style="font-size:13px;">Allow P-AI to generate and export reports.</p>
+                        <hr />
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="custom-control custom-switch mb-3">
+                                    <input type="checkbox" class="custom-control-input" id="ai_can_generate_reports" name="ai_can_generate_reports" value="1" <?php echo ai_perm($ai_row, 'ai_can_generate_reports', 1) ? 'checked' : ''; ?>>
+                                    <label class="custom-control-label" for="ai_can_generate_reports">Generate Reports <span class="badge badge-primary badge-sm">NEW</span></label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="custom-control custom-switch mb-3">
+                                    <input type="checkbox" class="custom-control-input" id="ai_can_export_data" name="ai_can_export_data" value="1" <?php echo ai_perm($ai_row, 'ai_can_export_data', 1) ? 'checked' : ''; ?>>
+                                    <label class="custom-control-label" for="ai_can_export_data">Export Data (CSV/Excel) <span class="badge badge-primary badge-sm">NEW</span></label>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- CUSTOMER MANAGEMENT SECTION -->
+                    <section class="mt-4">
+                        <h4 class="card-title"><b><i class="mdi mdi-account-multiple"></i> Customer Management</b></h4>
+                        <p class="text-muted" style="font-size:13px;">Allow P-AI to manage customer records.</p>
+                        <hr />
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="custom-control custom-switch mb-3">
+                                    <input type="checkbox" class="custom-control-input" id="ai_can_create_customers" name="ai_can_create_customers" value="1" <?php echo ai_perm($ai_row, 'ai_can_create_customers', 0) ? 'checked' : ''; ?>>
+                                    <label class="custom-control-label" for="ai_can_create_customers">Create Customers <span class="badge badge-primary badge-sm">NEW</span></label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="custom-control custom-switch mb-3">
+                                    <input type="checkbox" class="custom-control-input" id="ai_can_edit_customers" name="ai_can_edit_customers" value="1" <?php echo ai_perm($ai_row, 'ai_can_edit_customers', 0) ? 'checked' : ''; ?>>
+                                    <label class="custom-control-label" for="ai_can_edit_customers">Edit Customers <span class="badge badge-primary badge-sm">NEW</span></label>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- FINANCIAL OPERATIONS SECTION -->
+                    <section class="mt-4">
+                        <h4 class="card-title"><b><i class="mdi mdi-cash-multiple"></i> Financial Operations</b></h4>
+                        <p class="text-muted" style="font-size:13px;">High-risk financial actions (use with caution).</p>
+                        <hr />
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="custom-control custom-switch mb-3">
+                                    <input type="checkbox" class="custom-control-input" id="ai_can_process_refunds" name="ai_can_process_refunds" value="1" <?php echo ai_perm($ai_row, 'ai_can_process_refunds', 0) ? 'checked' : ''; ?>>
+                                    <label class="custom-control-label" for="ai_can_process_refunds">Process Refunds <span class="badge badge-danger badge-sm">HIGH RISK</span></label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="custom-control custom-switch mb-3">
+                                    <input type="checkbox" class="custom-control-input" id="ai_can_apply_discounts" name="ai_can_apply_discounts" value="1" <?php echo ai_perm($ai_row, 'ai_can_apply_discounts', 0) ? 'checked' : ''; ?>>
+                                    <label class="custom-control-label" for="ai_can_apply_discounts">Apply Discounts <span class="badge badge-warning badge-sm">MEDIUM RISK</span></label>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- ADVANCED FEATURES SECTION -->
+                    <section class="mt-4">
+                        <h4 class="card-title"><b><i class="mdi mdi-brain"></i> Advanced Intelligence Features</b></h4>
+                        <p class="text-muted" style="font-size:13px;">Enable advanced AI capabilities.</p>
+                        <hr />
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="custom-control custom-switch mb-3">
+                                    <input type="checkbox" class="custom-control-input" id="ai_can_predict_analytics" name="ai_can_predict_analytics" value="1" <?php echo ai_perm($ai_row, 'ai_can_predict_analytics', 1) ? 'checked' : ''; ?>>
+                                    <label class="custom-control-label" for="ai_can_predict_analytics">Predictive Analytics <span class="badge badge-primary badge-sm">NEW</span></label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="custom-control custom-switch mb-3">
+                                    <input type="checkbox" class="custom-control-input" id="ai_can_optimize_routes" name="ai_can_optimize_routes" value="1" <?php echo ai_perm($ai_row, 'ai_can_optimize_routes', 0) ? 'checked' : ''; ?>>
+                                    <label class="custom-control-label" for="ai_can_optimize_routes">Route Optimization <span class="badge badge-primary badge-sm">NEW</span></label>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <div class="form-group mt-4">
                         <div class="col-sm-12">
-                            <button type="button" class="btn btn-primary" id="btn_save_ai">
-                                Save AI Settings <i class="icon-ok"></i>
+                            <button type="button" class="btn btn-primary btn-lg" id="btn_save_ai">
+                                <i class="mdi mdi-content-save"></i> Save All AI Settings
+                            </button>
+                            <button type="button" class="btn btn-secondary ml-2" onclick="location.reload();">
+                                <i class="mdi mdi-refresh"></i> Reset
                             </button>
                         </div>
                     </div>
@@ -140,12 +391,54 @@ document.querySelectorAll('.toggle-eye').forEach(function(btn) {
 document.getElementById('btn_save_ai').addEventListener('click', function () {
     var btn = this;
     btn.disabled = true;
-    btn.innerText = 'Saving...';
+    btn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Saving...';
 
     var formData = new FormData();
+    
+    // API Keys & Provider
     formData.append('groq_api_key',   document.getElementById('groq_api_key').value);
     formData.append('openai_api_key', document.getElementById('openai_api_key').value);
     formData.append('ai_provider',    document.getElementById('ai_provider').value);
+    
+    // Autopilot Settings
+    formData.append('ai_autopilot_enabled', document.getElementById('ai_autopilot_enabled').checked ? '1' : '0');
+    formData.append('ai_autopilot_threshold', document.getElementById('ai_autopilot_threshold').value);
+    
+    // Read Permissions
+    formData.append('ai_can_read_customers', document.getElementById('ai_can_read_customers').checked ? '1' : '0');
+    formData.append('ai_can_read_packages', document.getElementById('ai_can_read_packages').checked ? '1' : '0');
+    formData.append('ai_can_read_financials', document.getElementById('ai_can_read_financials').checked ? '1' : '0');
+    formData.append('ai_can_read_drivers', document.getElementById('ai_can_read_drivers').checked ? '1' : '0');
+    formData.append('ai_can_read_inventory', document.getElementById('ai_can_read_inventory').checked ? '1' : '0');
+    
+    // Action Permissions
+    formData.append('ai_can_assign_drivers', document.getElementById('ai_can_assign_drivers').checked ? '1' : '0');
+    formData.append('ai_can_confirm_payments', document.getElementById('ai_can_confirm_payments').checked ? '1' : '0');
+    formData.append('ai_can_update_status', document.getElementById('ai_can_update_status').checked ? '1' : '0');
+    formData.append('ai_can_create_shipments', document.getElementById('ai_can_create_shipments').checked ? '1' : '0');
+    formData.append('ai_can_edit_shipments', document.getElementById('ai_can_edit_shipments').checked ? '1' : '0');
+    formData.append('ai_can_cancel_shipments', document.getElementById('ai_can_cancel_shipments').checked ? '1' : '0');
+    
+    // Communication Permissions
+    formData.append('ai_can_send_sms', document.getElementById('ai_can_send_sms').checked ? '1' : '0');
+    formData.append('ai_can_send_email', document.getElementById('ai_can_send_email').checked ? '1' : '0');
+    formData.append('ai_can_send_whatsapp', document.getElementById('ai_can_send_whatsapp').checked ? '1' : '0');
+    
+    // Reporting Permissions
+    formData.append('ai_can_generate_reports', document.getElementById('ai_can_generate_reports').checked ? '1' : '0');
+    formData.append('ai_can_export_data', document.getElementById('ai_can_export_data').checked ? '1' : '0');
+    
+    // Customer Management
+    formData.append('ai_can_create_customers', document.getElementById('ai_can_create_customers').checked ? '1' : '0');
+    formData.append('ai_can_edit_customers', document.getElementById('ai_can_edit_customers').checked ? '1' : '0');
+    
+    // Financial Operations
+    formData.append('ai_can_process_refunds', document.getElementById('ai_can_process_refunds').checked ? '1' : '0');
+    formData.append('ai_can_apply_discounts', document.getElementById('ai_can_apply_discounts').checked ? '1' : '0');
+    
+    // Advanced Features
+    formData.append('ai_can_predict_analytics', document.getElementById('ai_can_predict_analytics').checked ? '1' : '0');
+    formData.append('ai_can_optimize_routes', document.getElementById('ai_can_optimize_routes').checked ? '1' : '0');
 
     var xhr = new XMLHttpRequest();
     xhr.open('POST', 'ajax/ai/save_ai_config_ajax.php', true);
@@ -163,12 +456,12 @@ document.getElementById('btn_save_ai').addEventListener('click', function () {
         }
         box.scrollIntoView({ behavior: 'smooth' });
         btn.disabled = false;
-        btn.innerHTML = 'Save AI Settings <i class="icon-ok"></i>';
+        btn.innerHTML = '<i class="mdi mdi-content-save"></i> Save All AI Settings';
     };
     xhr.onerror = function () {
         document.getElementById('resultados_ajax').innerHTML = '<div class="alert alert-danger">Request failed. Check your server.</div>';
         btn.disabled = false;
-        btn.innerHTML = 'Save AI Settings <i class="icon-ok"></i>';
+        btn.innerHTML = '<i class="mdi mdi-content-save"></i> Save All AI Settings';
     };
     xhr.send(formData);
 });
