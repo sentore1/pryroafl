@@ -286,7 +286,7 @@ $currentProvider = $core->whatsapp_provider ?: 'ultramsg';
 													<div class="form-group">
 														<label class="custom-control custom-checkbox">
 															<input type="checkbox" class="custom-control-input" name="enable_direct_link_buttons" id="enable_direct_link_buttons" value="1"
-																<?php echo (isset($core->enable_direct_link_buttons) && $core->enable_direct_link_buttons == 1) ? 'checked' : 'checked'; ?>>
+																<?php echo (isset($core->enable_direct_link_buttons) && $core->enable_direct_link_buttons == 1) ? 'checked' : ''; ?>>
 															<span class="custom-control-indicator"></span>
 															Show Direct Link Buttons (wa.me)
 														</label>
@@ -297,7 +297,7 @@ $currentProvider = $core->whatsapp_provider ?: 'ultramsg';
 													<div class="form-group">
 														<label class="custom-control custom-checkbox">
 															<input type="checkbox" class="custom-control-input" name="enable_api_buttons" id="enable_api_buttons" value="1"
-																<?php echo (isset($core->enable_api_buttons) && $core->enable_api_buttons == 1) ? 'checked' : 'checked'; ?>>
+																<?php echo (isset($core->enable_api_buttons) && $core->enable_api_buttons == 1) ? 'checked' : ''; ?>>
 															<span class="custom-control-indicator"></span>
 															Show API Notification Checkboxes
 														</label>

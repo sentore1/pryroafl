@@ -101,6 +101,11 @@ class Core
   // Meta Cloud API
   public $meta_wa_token;
   public $meta_wa_phone_id;
+  // WhatsApp Method Settings
+  public $whatsapp_method;
+  public $whatsapp_default_action;
+  public $enable_direct_link_buttons;
+  public $enable_api_buttons;
 
   public $tax;
   public $insurance;
@@ -216,6 +221,11 @@ class Core
     $this->twilio_wa_number = $settings->twilio_wa_number ?? '';
     $this->meta_wa_token    = $settings->meta_wa_token    ?? '';
     $this->meta_wa_phone_id = $settings->meta_wa_phone_id ?? '';
+    // WhatsApp Method Settings
+    $this->whatsapp_method = $settings->whatsapp_method ?? 'api';
+    $this->whatsapp_default_action = $settings->whatsapp_default_action ?? 'api';
+    $this->enable_direct_link_buttons = $settings->enable_direct_link_buttons ?? 1;
+    $this->enable_api_buttons = $settings->enable_api_buttons ?? 1;
 
     //SETTINGS TRACK INVOICE AND TAXES
     $this->version = $settings->version;

@@ -212,14 +212,31 @@ foreach ($data as $index => $row) {
         $shipment = $db->cdp_registro();
         
         if (!$shipment) {
+            // Check if CBM mode is enabled
+            $cbm_enabled = isset($core->cbm_calculation_enabled) && $core->cbm_calculation_enabled == 1;
+            
             // Calculate dimensions before creating records
             $weight = isset($row['weight']) ? floatval($row['weight']) : 1;
-            $length = isset($row['length']) ? floatval($row['length']) : 1;
-            $width = isset($row['width']) ? floatval($row['width']) : 1;
-            $height = isset($row['height']) ? floatval($row['height']) : 1;
             $item_description = isset($row['item_description']) && !empty($row['item_description']) ? trim($row['item_description']) : 'Package';
-            $volumetric_weight = ($length * $width * $height) / 5000;
-            $total_weight = $weight + $volumetric_weight;
+            
+            // Handle CBM or Dimension mode
+            if ($cbm_enabled) {
+                // CBM Mode: Use CBM value directly from CSV/Excel
+                $cbm = isset($row['cbm']) ? floatval($row['cbm']) : 0;
+                $length = 0;
+                $width = 0;
+                $height = 0;
+                $volumetric_weight = 0;
+                $total_weight = $weight; // Only actual weight in CBM mode
+            } else {
+                // Dimension Mode: Use dimensions for volumetric weight
+                $length = isset($row['length']) ? floatval($row['length']) : 1;
+                $width = isset($row['width']) ? floatval($row['width']) : 1;
+                $height = isset($row['height']) ? floatval($row['height']) : 1;
+                $cbm = 0;
+                $volumetric_weight = ($length * $width * $height) / 5000;
+                $total_weight = $weight + $volumetric_weight;
+            }
             
             // Create recipient record in cdb_recipients table
             $db->cdp_query("INSERT INTO cdb_recipients (
@@ -237,7 +254,7 @@ foreach ($data as $index => $row) {
             
             $recipient_record_id = $db->dbh->lastInsertId();
             
-            // Create shipment order with all required fields (without individual weight/dimension columns)
+            // Create shipment order with all required fields (including CBM support)
             $db->cdp_query("INSERT INTO cdb_add_order (
                 order_prefix, order_no, sender_id, receiver_id, 
                 order_date, status_courier, is_consolidate, order_incomplete,
@@ -249,7 +266,7 @@ foreach ($data as $index => $row) {
                 declared_value, total_declared_value, total_fixed_value,
                 total_insured_value, tax_insurance_value, total_tax_insurance,
                 tax_custom_tariffis_value, total_tax_custom_tariffis,
-                total_reexp, total_weight, value_weight, volumetric_percentage
+                total_reexp, total_weight, total_cbm, value_weight, volumetric_percentage
             ) VALUES (
                 :order_prefix, :order_no, :sender_id, :receiver_id,
                 NOW(), 1, 0, 1,
@@ -261,7 +278,7 @@ foreach ($data as $index => $row) {
                 0, 0, 0,
                 0, 0, 0,
                 0, 0,
-                0, :total_weight, 0, 5000
+                0, :total_weight, :total_cbm, 0, 5000
             )");
             
             $db->bind(':order_prefix', $tracking_prefix);
@@ -270,6 +287,7 @@ foreach ($data as $index => $row) {
             $db->bind(':receiver_id', $recipient_record_id);
             $db->bind(':user_id', $userData->id);
             $db->bind(':total_weight', $total_weight);
+            $db->bind(':total_cbm', $cbm);
             $db->cdp_execute();
             
             $shipment_id = $db->dbh->lastInsertId();
@@ -302,15 +320,15 @@ foreach ($data as $index => $row) {
             $db->bind(':recipient_address', $recipient_address);
             $db->cdp_execute();
             
-            // Create package record
+            // Create package record with CBM support
             $db->cdp_query("INSERT INTO cdb_add_order_item (
                 order_id, order_item_description, order_item_quantity,
                 order_item_weight, order_item_length, order_item_width, order_item_height,
-                order_item_declared_value, order_item_fixed_value
+                cbm, order_item_declared_value, order_item_fixed_value
             ) VALUES (
                 :order_id, :item_description, 1,
                 :weight, :length, :width, :height,
-                0, 0
+                :cbm, 0, 0
             )");
             $db->bind(':order_id', $shipment_id);
             $db->bind(':item_description', $item_description);
@@ -318,6 +336,7 @@ foreach ($data as $index => $row) {
             $db->bind(':length', $length);
             $db->bind(':width', $width);
             $db->bind(':height', $height);
+            $db->bind(':cbm', $cbm);
             $db->cdp_execute();
             
             // Create shipment object

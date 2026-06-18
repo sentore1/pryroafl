@@ -31,17 +31,19 @@ $(document).ready(function () {
             $('#default_action_section').hide();
         }
         
-        // Update info message
+        // Show/hide relevant switches based on method, but don't force their values
         if (method === 'api') {
-            $('#enable_direct_link_buttons').prop('disabled', true).prop('checked', false);
-            $('#enable_api_buttons').prop('disabled', false);
+            // API only - user can't use direct link buttons
+            $('#enable_direct_link_buttons').closest('.col-md-6').hide();
+            $('#enable_api_buttons').closest('.col-md-6').show();
         } else if (method === 'direct_link') {
-            $('#enable_api_buttons').prop('disabled', true).prop('checked', false);
-            $('#enable_direct_link_buttons').prop('disabled', false).prop('checked', true);
+            // Direct Link only - user can't use API buttons
+            $('#enable_api_buttons').closest('.col-md-6').hide();
+            $('#enable_direct_link_buttons').closest('.col-md-6').show();
         } else {
-            // Both
-            $('#enable_direct_link_buttons').prop('disabled', false);
-            $('#enable_api_buttons').prop('disabled', false);
+            // Both - show both switches
+            $('#enable_direct_link_buttons').closest('.col-md-6').show();
+            $('#enable_api_buttons').closest('.col-md-6').show();
         }
     }
     
