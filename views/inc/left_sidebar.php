@@ -337,7 +337,7 @@
 						<ul aria-expanded="false" class="collapse  first-level">
 							<li class="sidebar-item">
 								<a class="sidebar-link waves-effect waves-dark" href="customers_list.php" aria-expanded="false">
-									<i class="mdi mdi-adjust" style="color:#fc3f7"></i>
+									<i class="mdi mdi-account-multiple" style="color:#fc3f7"></i>
 									<span class="hide-menu"> <?php echo $lang['left-menu-sidebar-31'] ?> </span>
 								</a>
 							</li>
@@ -914,7 +914,7 @@
 						<ul aria-expanded="false" class="collapse  first-level">
 							<li class="sidebar-item">
 								<a class="sidebar-link waves-effect waves-dark" href="customers_list.php" aria-expanded="false">
-									<i class="mdi mdi-adjust" style="color:#fc3f7"></i>
+									<i class="mdi mdi-account-multiple" style="color:#fc3f7"></i>
 									<span class="hide-menu"> <?php echo $lang['left-menu-sidebar-31'] ?> </span>
 								</a>
 							</li>

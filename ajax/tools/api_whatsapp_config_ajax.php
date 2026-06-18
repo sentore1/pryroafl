@@ -31,6 +31,28 @@ if ($provider === 'ultramsg') {
 }
 
 $active_whatsapp = isset($_POST['active_whatsapp']) ? 1 : 0;
+$whatsapp_method = isset($_POST['whatsapp_method']) ? trim($_POST['whatsapp_method']) : 'api';
+$whatsapp_default_action = isset($_POST['whatsapp_default_action']) ? trim($_POST['whatsapp_default_action']) : 'api';
+$enable_direct_link_buttons = isset($_POST['enable_direct_link_buttons']) ? 1 : 0;
+$enable_api_buttons = isset($_POST['enable_api_buttons']) ? 1 : 0;
+
+// Validate method selection
+if (!in_array($whatsapp_method, ['api', 'direct_link', 'both'])) {
+    $whatsapp_method = 'api';
+}
+
+// Validate default action
+if (!in_array($whatsapp_default_action, ['api', 'direct_link', 'none'])) {
+    $whatsapp_default_action = 'api';
+}
+
+// Only validate API credentials if API method is enabled
+if ($whatsapp_method === 'api' || $whatsapp_method === 'both') {
+    // Provider validation stays the same
+} else {
+    // If only using direct_link, clear errors (no API validation needed)
+    $errors = array();
+}
 
 if (CDP_APP_MODE_DEMO === true) {
     echo json_encode(['status' => 'error', 'message' => 'Demo mode — action not allowed.']);
@@ -52,6 +74,10 @@ $data = array(
     'twilio_wa_number'  => trim($_POST['twilio_wa_number']  ?? ''),
     'meta_wa_token'     => trim($_POST['meta_wa_token']     ?? ''),
     'meta_wa_phone_id'  => trim($_POST['meta_wa_phone_id']  ?? ''),
+    'whatsapp_method'   => $whatsapp_method,
+    'whatsapp_default_action' => $whatsapp_default_action,
+    'enable_direct_link_buttons' => $enable_direct_link_buttons,
+    'enable_api_buttons' => $enable_api_buttons,
 );
 
 // Buffer any stray output (e.g. PDO error echoes from Conexion)

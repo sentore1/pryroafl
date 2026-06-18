@@ -210,6 +210,102 @@ $currentProvider = $core->whatsapp_provider ?: 'ultramsg';
 												</div>
 											</div>
 
+											<!-- WhatsApp Method Selection -->
+											<div class="row mt-4">
+												<div class="col-md-12">
+													<hr>
+													<h4 class="mb-3">WhatsApp Sending Method</h4>
+													<p class="text-muted">Choose how WhatsApp messages will be sent in your system</p>
+												</div>
+											</div>
+
+											<div class="row mb-3">
+												<div class="col-md-12">
+													<label class="mb-2"><strong>Select Method</strong></label>
+													<div class="form-group">
+														<select name="whatsapp_method" id="whatsapp_method" class="form-control">
+															<option value="api" <?php echo (isset($core->whatsapp_method) && $core->whatsapp_method === 'api') ? 'selected' : ''; ?>>
+																API Only (Twilio/Meta/UltraMsg) - Automatic background sending
+															</option>
+															<option value="direct_link" <?php echo (isset($core->whatsapp_method) && $core->whatsapp_method === 'direct_link') ? 'selected' : ''; ?>>
+																Direct Link Only (wa.me) - Free manual sending
+															</option>
+															<option value="both" <?php echo (isset($core->whatsapp_method) && $core->whatsapp_method === 'both') ? 'selected' : ''; ?>>
+																Both Methods - User can choose
+															</option>
+														</select>
+													</div>
+												</div>
+											</div>
+
+											<!-- Method comparison info -->
+											<div class="row mb-3">
+												<div class="col-md-12">
+													<div class="alert alert-info">
+														<strong>Method Comparison:</strong>
+														<ul class="mb-0 mt-2">
+															<li><strong>API Method:</strong> Automatic, background sending. Requires API credentials. Costs per message.</li>
+															<li><strong>Direct Link:</strong> Opens WhatsApp in browser/app. 100% FREE. Manual send by user.</li>
+															<li><strong>Both:</strong> Best of both worlds. Use API for automation, Direct Link for manual messages.</li>
+														</ul>
+													</div>
+												</div>
+											</div>
+
+											<!-- Default action when both enabled -->
+											<div class="row mb-3" id="default_action_section" style="display: none;">
+												<div class="col-md-12">
+													<label><strong>Default Automatic Action (when both methods enabled)</strong></label>
+													<div class="form-group">
+														<select name="whatsapp_default_action" id="whatsapp_default_action" class="form-control">
+															<option value="api" <?php echo (isset($core->whatsapp_default_action) && $core->whatsapp_default_action === 'api') ? 'selected' : ''; ?>>
+																Use API for automatic notifications
+															</option>
+															<option value="direct_link" <?php echo (isset($core->whatsapp_default_action) && $core->whatsapp_default_action === 'direct_link') ? 'selected' : ''; ?>>
+																Use Direct Link (user must click)
+															</option>
+															<option value="none" <?php echo (isset($core->whatsapp_default_action) && $core->whatsapp_default_action === 'none') ? 'selected' : ''; ?>>
+																No automatic notifications (manual only)
+															</option>
+														</select>
+													</div>
+													<small class="text-muted">This controls what happens when shipment is created/updated with notification checkboxes checked</small>
+												</div>
+											</div>
+
+											<!-- UI Button Controls -->
+											<div class="row mt-3">
+												<div class="col-md-12">
+													<h5>UI Button Controls</h5>
+													<p class="text-muted">Control which buttons appear in the interface</p>
+												</div>
+											</div>
+
+											<div class="row mb-2">
+												<div class="col-md-6">
+													<div class="form-group">
+														<label class="custom-control custom-checkbox">
+															<input type="checkbox" class="custom-control-input" name="enable_direct_link_buttons" id="enable_direct_link_buttons" value="1"
+																<?php echo (isset($core->enable_direct_link_buttons) && $core->enable_direct_link_buttons == 1) ? 'checked' : 'checked'; ?>>
+															<span class="custom-control-indicator"></span>
+															Show Direct Link Buttons (wa.me)
+														</label>
+														<small class="text-muted d-block">Shows WhatsApp buttons that open wa.me links</small>
+													</div>
+												</div>
+												<div class="col-md-6">
+													<div class="form-group">
+														<label class="custom-control custom-checkbox">
+															<input type="checkbox" class="custom-control-input" name="enable_api_buttons" id="enable_api_buttons" value="1"
+																<?php echo (isset($core->enable_api_buttons) && $core->enable_api_buttons == 1) ? 'checked' : 'checked'; ?>>
+															<span class="custom-control-indicator"></span>
+															Show API Notification Checkboxes
+														</label>
+														<small class="text-muted d-block">Shows checkboxes for automatic API notifications</small>
+													</div>
+												</div>
+											</div>
+
 											<div class="form-group">
 												<div class="col-sm-12">
 													<button class="btn btn-primary btn-confirmation" name="dosubmit" type="submit">

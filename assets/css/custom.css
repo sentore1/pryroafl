@@ -70,3 +70,40 @@ body {
 .left-sidebar .sidebar-nav ul#sidebarnav > li.active > a i {
     color: #467FFF !important;
 }
+
+/* Replace bullet dots with vertical lines in sidebar submenu */
+.sidebar-nav .first-level .sidebar-item {
+    position: relative;
+}
+
+/* Hide the mdi-adjust icons in sidebar submenu */
+.sidebar-nav .first-level .sidebar-item .sidebar-link .mdi-adjust {
+    display: none !important;
+}
+
+/* Add vertical line before the submenu item */
+.sidebar-nav .first-level .sidebar-item:before {
+    content: "";
+    position: absolute;
+    left: 28px;
+    top: 0;
+    bottom: 0;
+    width: 1px;
+    background-color: #d5d7da;
+}
+
+/* Remove bottom line for last item */
+.sidebar-nav .first-level .sidebar-item:last-child:before {
+    bottom: 50%;
+}
+
+/* Change line color on hover and active states */
+.sidebar-nav .first-level .sidebar-item:hover:before,
+.sidebar-nav .first-level .sidebar-item.active:before {
+    background-color: #467FFF;
+}
+
+/* Push submenu items to the right */
+.sidebar-nav .first-level .sidebar-item .sidebar-link {
+    padding-left: 40px !important;
+}

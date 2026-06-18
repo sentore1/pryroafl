@@ -21,6 +21,38 @@ $(document).ready(function () {
         switchProvider($(this).val());
     });
 
+    // Handle WhatsApp method change
+    function updateMethodUI() {
+        var method = $('#whatsapp_method').val();
+        
+        if (method === 'both') {
+            $('#default_action_section').show();
+        } else {
+            $('#default_action_section').hide();
+        }
+        
+        // Update info message
+        if (method === 'api') {
+            $('#enable_direct_link_buttons').prop('disabled', true).prop('checked', false);
+            $('#enable_api_buttons').prop('disabled', false);
+        } else if (method === 'direct_link') {
+            $('#enable_api_buttons').prop('disabled', true).prop('checked', false);
+            $('#enable_direct_link_buttons').prop('disabled', false).prop('checked', true);
+        } else {
+            // Both
+            $('#enable_direct_link_buttons').prop('disabled', false);
+            $('#enable_api_buttons').prop('disabled', false);
+        }
+    }
+    
+    // Initialize method UI
+    updateMethodUI();
+    
+    // On method change
+    $('#whatsapp_method').on('change', function() {
+        updateMethodUI();
+    });
+
     // Highlight on input
     $('.ultramsg-field, .twilio-field, .meta-field').on('input', function () {
         $(this).toggleClass('highlight', $(this).val() === '');
@@ -31,25 +63,29 @@ $(document).ready(function () {
         event.preventDefault();
 
         var provider = $('input[name="whatsapp_provider"]:checked').val();
+        var method = $('#whatsapp_method').val();
         var emptyFields = [];
 
-        if (provider === 'ultramsg') {
-            if ($('#api_ws_url').val() === '')   emptyFields.push('api_ws_url');
-            if ($('#api_ws_token').val() === '')  emptyFields.push('api_ws_token');
-        } else if (provider === 'twilio') {
-            if ($('#twilio_wa_sid').val() === '')    emptyFields.push('twilio_wa_sid');
-            if ($('#twilio_wa_token').val() === '')  emptyFields.push('twilio_wa_token');
-            if ($('#twilio_wa_number').val() === '') emptyFields.push('twilio_wa_number');
-        } else if (provider === 'meta') {
-            if ($('#meta_wa_token').val() === '')    emptyFields.push('meta_wa_token');
-            if ($('#meta_wa_phone_id').val() === '') emptyFields.push('meta_wa_phone_id');
+        // Only validate API fields if API method is enabled
+        if (method === 'api' || method === 'both') {
+            if (provider === 'ultramsg') {
+                if ($('#api_ws_url').val() === '')   emptyFields.push('api_ws_url');
+                if ($('#api_ws_token').val() === '')  emptyFields.push('api_ws_token');
+            } else if (provider === 'twilio') {
+                if ($('#twilio_wa_sid').val() === '')    emptyFields.push('twilio_wa_sid');
+                if ($('#twilio_wa_token').val() === '')  emptyFields.push('twilio_wa_token');
+                if ($('#twilio_wa_number').val() === '') emptyFields.push('twilio_wa_number');
+            } else if (provider === 'meta') {
+                if ($('#meta_wa_token').val() === '')    emptyFields.push('meta_wa_token');
+                if ($('#meta_wa_phone_id').val() === '') emptyFields.push('meta_wa_phone_id');
+            }
         }
 
-        if (emptyFields.length > 0) {
+        if (emptyFields.length > 0 && (method === 'api' || method === 'both')) {
             Swal.fire({
                 type: 'error',
                 title: message_error_form21,
-                text: message_error_form22,
+                text: 'Please fill in all required fields for the selected API provider',
                 confirmButtonColor: '#336aea',
                 showConfirmButton: true,
             });
@@ -84,7 +120,8 @@ $(document).ready(function () {
                 if (response.status === 'success') {
                     Swal.fire({
                         type: 'success',
-                        title: message_error_form15,
+                        title: 'Settings Saved Successfully!',
+                        text: 'WhatsApp method: ' + method.toUpperCase(),
                         showConfirmButton: false,
                         timer: 1500,
                         timerProgressBar: true,
