@@ -35,10 +35,15 @@
 					</li>
 
 					<li class="p-15 m-t-10">
-						<a href="courier_add.php" class="btn btn-block create-btn text-white no-block d-flex align-items-center">
-							<i class="ti-package" style="color:#fff !important"></i>
-							<span class="hide-menu m-l-5"> <?php echo $lang['left-menu-sidebar-1'] ?> </span>
-						</a>
+						<div class="d-flex align-items-center">
+							<a href="courier_add.php" class="btn create-btn text-white no-block d-flex align-items-center flex-grow-1" style="margin-right: 10px;">
+								<i class="ti-package" style="color:#fff !important"></i>
+								<span class="hide-menu m-l-5"> <?php echo $lang['left-menu-sidebar-1'] ?> </span>
+							</a>
+							<a href="courier_bulk_upload.php" class="btn d-flex align-items-center justify-content-center" style="width: 40px; height: 40px; padding: 0; background-color: #e9ecef; border: none; border-radius: 12px;">
+								<i class="mdi mdi-upload" style="color: #4e73df; font-size: 18px;"></i>
+							</a>
+						</div>
 					</li>
 
 					<li class="nav-small-cap"> <span class="hide-menu"></span></li>
@@ -237,7 +242,6 @@
 
 									<li class="sidebar-item">
 										<a href="consolidate_bulk_upload.php" class="sidebar-link">
-											<i class="mdi mdi-upload" style="color:#fc3f7"></i>
 											<span class="hide-menu"> Bulk Upload </span>
 										</a>
 									</li>

@@ -107,3 +107,108 @@ body {
 .sidebar-nav .first-level .sidebar-item .sidebar-link {
     padding-left: 40px !important;
 }
+
+/* Keep logo visible even when sidebar is mini */
+#main-wrapper[data-layout=vertical][data-sidebartype=mini-sidebar] .topbar .top-navbar .navbar-header .logo-text {
+    display: block !important;
+}
+
+/* Expand navbar-header width when sidebar is mini to show full logo */
+#main-wrapper[data-layout=vertical][data-sidebartype=mini-sidebar] .topbar .top-navbar .navbar-header {
+    width: 250px !important;
+}
+
+/* Scale down logo image when sidebar is mini */
+#main-wrapper[data-layout=vertical][data-sidebartype=mini-sidebar] .topbar .top-navbar .navbar-header .logo-text img {
+    max-width: 50px !important;
+    max-height: 20px !important;
+    width: auto !important;
+    height: auto !important;
+}
+
+/* Keep sidebar toggle button visible and styled */
+#main-wrapper[data-layout=vertical][data-sidebartype=mini-sidebar] .sidebartoggler,
+#main-wrapper[data-sidebartype=mini-sidebar] .sidebartoggler,
+.sidebartoggler {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    color: #2c3e50 !important;
+    position: relative !important;
+    z-index: 9999 !important;
+}
+
+#main-wrapper[data-layout=vertical][data-sidebartype=mini-sidebar] .sidebartoggler i,
+#main-wrapper[data-sidebartype=mini-sidebar] .sidebartoggler i,
+.sidebartoggler i {
+    color: #2c3e50 !important;
+    display: inline-block !important;
+    visibility: visible !important;
+}
+
+/* Keep all navbar items visible when sidebar is mini */
+#main-wrapper[data-layout=vertical][data-sidebartype=mini-sidebar] .topbar .navbar-nav,
+#main-wrapper[data-sidebartype=mini-sidebar] .topbar .navbar-nav {
+    display: flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
+#main-wrapper[data-layout=vertical][data-sidebartype=mini-sidebar] .topbar .navbar-nav .nav-item,
+#main-wrapper[data-sidebartype=mini-sidebar] .topbar .navbar-nav .nav-item {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
+#main-wrapper[data-layout=vertical][data-sidebartype=mini-sidebar] .topbar .navbar-collapse,
+#main-wrapper[data-sidebartype=mini-sidebar] .topbar .navbar-collapse {
+    display: flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
+/* Specifically target the nav-item containing the toggle */
+#main-wrapper[data-layout=vertical][data-sidebartype=mini-sidebar] .navbar-nav.float-left,
+#main-wrapper[data-sidebartype=mini-sidebar] .navbar-nav.float-left {
+    display: flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
+#main-wrapper[data-layout=vertical][data-sidebartype=mini-sidebar] .navbar-nav.float-left .nav-item,
+#main-wrapper[data-sidebartype=mini-sidebar] .navbar-nav.float-left .nav-item {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
+/* Make user profile smaller when sidebar is mini */
+#main-wrapper[data-layout=vertical][data-sidebartype=mini-sidebar] .left-sidebar .user-profile {
+    padding: 10px 5px !important;
+    text-align: center !important;
+}
+
+#main-wrapper[data-layout=vertical][data-sidebartype=mini-sidebar] .left-sidebar .user-profile .user-pic {
+    margin: 0 auto !important;
+}
+
+#main-wrapper[data-layout=vertical][data-sidebartype=mini-sidebar] .left-sidebar .user-profile .user-pic img {
+    width: 40px !important;
+    height: 40px !important;
+}
+
+#main-wrapper[data-layout=vertical][data-sidebartype=mini-sidebar] .left-sidebar .user-profile .user-content {
+    display: none !important;
+}
+
+/* Hide create button text when sidebar is mini, keep icon only */
+#main-wrapper[data-layout=vertical][data-sidebartype=mini-sidebar] .left-sidebar .create-btn .hide-menu {
+    display: none !important;
+}
+
+#main-wrapper[data-layout=vertical][data-sidebartype=mini-sidebar] .left-sidebar .create-btn {
+    padding: 10px !important;
+    text-align: center !important;
+    justify-content: center !important;
+}
