@@ -364,8 +364,14 @@ function ai_perm($row, $field, $default = 0) {
                             <button type="button" class="btn btn-secondary ml-2" onclick="location.reload();">
                                 <i class="mdi mdi-refresh"></i> Reset
                             </button>
+                            <button type="button" class="btn btn-info ml-2" id="btn_test_connection">
+                                <i class="mdi mdi-stethoscope"></i> Test Connection
+                            </button>
                         </div>
                     </div>
+                    
+                    <!-- Test Results Panel -->
+                    <div id="test_results" class="mt-3" style="display:none;"></div>
                 </form>
             </div>
         </div>
@@ -373,6 +379,89 @@ function ai_perm($row, $field, $default = 0) {
 </div>
 
 <script>
+// Test Connection Function
+document.getElementById('btn_test_connection').addEventListener('click', function() {
+    var btn = this;
+    var resultsDiv = document.getElementById('test_results');
+    
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Testing...';
+    resultsDiv.style.display = 'block';
+    resultsDiv.innerHTML = '<div class="alert alert-info"><i class="fa fa-spinner fa-spin"></i> Running connection tests...</div>';
+    
+    fetch('ajax/ai/test_connection.php')
+        .then(response => response.json())
+        .then(data => {
+            var html = '<div class="card">';
+            html += '<div class="card-header bg-primary text-white"><strong>Connection Test Results</strong> - ' + data.timestamp + '</div>';
+            html += '<div class="card-body">';
+            
+            // Overall Status
+            if (data.overall_status === 'READY') {
+                html += '<div class="alert alert-success"><i class="mdi mdi-check-circle"></i> <strong>All Systems Ready!</strong> P-AI is properly configured.</div>';
+            } else {
+                html += '<div class="alert alert-danger"><i class="mdi mdi-alert"></i> <strong>Configuration Error!</strong> See details below.</div>';
+            }
+            
+            // Individual Tests
+            html += '<table class="table table-bordered table-sm">';
+            html += '<thead><tr><th>Test</th><th>Status</th><th>Details</th></tr></thead><tbody>';
+            
+            html += '<tr><td>Loader File</td><td>' + (data.loader ? '<span class="badge badge-success">✓ OK</span>' : '<span class="badge badge-danger">✗ FAIL</span>') + '</td><td>loader.php</td></tr>';
+            
+            html += '<tr><td>Database</td><td>' + (data.database ? '<span class="badge badge-success">✓ OK</span>' : '<span class="badge badge-danger">✗ FAIL</span>') + '</td><td>MySQL connection</td></tr>';
+            
+            html += '<tr><td>User Class</td><td>' + (data.user_class ? '<span class="badge badge-success">✓ OK</span>' : '<span class="badge badge-danger">✗ FAIL</span>') + '</td><td>' + (data.user_id ? 'User ID: ' + data.user_id + ' (Level: ' + data.user_level + ')' : 'Not logged in') + '</td></tr>';
+            
+            html += '<tr><td>Permissions Class</td><td>' + (data.permissions_class ? '<span class="badge badge-success">✓ OK</span>' : '<span class="badge badge-danger">✗ FAIL</span>') + '</td><td>' + (data.autopilot_enabled ? 'Autopilot: ON' : 'Autopilot: OFF') + '</td></tr>';
+            
+            html += '<tr><td>API Key (Groq)</td><td>' + (data.groq_key_length > 0 ? '<span class="badge badge-success">✓ Configured</span>' : '<span class="badge badge-warning">○ Not Set</span>') + '</td><td>' + (data.groq_key_preview || 'No key') + ' (' + (data.groq_key_length || 0) + ' chars)</td></tr>';
+            
+            html += '<tr><td>API Key (OpenAI)</td><td>' + (data.openai_key_length > 0 ? '<span class="badge badge-success">✓ Configured</span>' : '<span class="badge badge-warning">○ Not Set</span>') + '</td><td>' + (data.openai_key_preview || 'No key') + ' (' + (data.openai_key_length || 0) + ' chars)</td></tr>';
+            
+            html += '<tr><td>cURL Support</td><td>' + (data.curl_enabled ? '<span class="badge badge-success">✓ Enabled</span>' : '<span class="badge badge-danger">✗ Missing</span>') + '</td><td>Required for API calls</td></tr>';
+            
+            html += '<tr><td>PHP Version</td><td><span class="badge badge-info">' + data.php_version + '</span></td><td>Current version</td></tr>';
+            
+            html += '</tbody></table>';
+            
+            // Errors
+            if (data.errors && data.errors.length > 0) {
+                html += '<div class="alert alert-danger mt-3"><strong>Errors:</strong><ul class="mb-0">';
+                data.errors.forEach(function(err) {
+                    html += '<li>' + err + '</li>';
+                });
+                html += '</ul></div>';
+            }
+            
+            // Recommendations
+            html += '<div class="alert alert-info mt-3"><strong>Next Steps:</strong><ul class="mb-0">';
+            if (!data.curl_enabled) {
+                html += '<li>Enable cURL extension in PHP</li>';
+            }
+            if (data.groq_key_length === 0 && data.openai_key_length === 0) {
+                html += '<li>Add at least one API key (Groq or OpenAI)</li>';
+            }
+            if (!data.is_admin) {
+                html += '<li>Log in with admin account to access P-AI</li>';
+            }
+            if (data.overall_status === 'READY') {
+                html += '<li style="color:green;">✓ Everything looks good! Try the AI panel now.</li>';
+            }
+            html += '</ul></div>';
+            
+            html += '</div></div>';
+            resultsDiv.innerHTML = html;
+        })
+        .catch(error => {
+            resultsDiv.innerHTML = '<div class="alert alert-danger"><strong>Test Failed:</strong> ' + error.message + '<br><small>Make sure ajax/ai/test_connection.php exists and is accessible.</small></div>';
+        })
+        .finally(function() {
+            btn.disabled = false;
+            btn.innerHTML = '<i class="mdi mdi-stethoscope"></i> Test Connection';
+        });
+});
+
 // Eye toggle for API key fields
 document.querySelectorAll('.toggle-eye').forEach(function(btn) {
     btn.addEventListener('click', function() {

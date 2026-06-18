@@ -1,13 +1,45 @@
 ﻿<?php
+// CRITICAL: No output before this point! Not even whitespace.
+// Disable display_errors and log to file instead to prevent breaking JSON
+error_reporting(E_ALL);
+ini_set('display_errors', 0); // MUST be 0 for AJAX endpoints
+ini_set('log_errors', 1);
+ini_set('error_log', '../../error_log.txt'); // Log to file instead
+
+// Clean any accidental output buffer
+if (ob_get_level()) ob_end_clean();
+ob_start();
+
 header('Content-Type: application/json');
 require_once("../../loader.php");
 require_once("ai_permissions_helper.php");
+require_once("local_ai_engine.php");
+
+// Wrap everything in try-catch for better error handling
+try {
 
 $user = new User;
 if (!$user->cdp_is_Admin()) {
     echo json_encode(['error' => 'Unauthorized']);
     exit;
 }
+
+// Simple rate limiting (prevent spam)
+session_start();
+$now = time();
+$min_delay = 2; // seconds between requests
+
+if (isset($_SESSION['last_ai_request'])) {
+    $time_since_last = $now - $_SESSION['last_ai_request'];
+    if ($time_since_last < $min_delay) {
+        echo json_encode([
+            'reply' => '⏱️ Please wait ' . ($min_delay - $time_since_last) . ' second(s) before sending another message. This helps prevent rate limiting.',
+            'actions' => []
+        ]);
+        exit;
+    }
+}
+$_SESSION['last_ai_request'] = $now;
 
 $message      = isset($_POST['message'])  ? trim($_POST['message'])  : '';
 $history_json = isset($_POST['history'])  ? $_POST['history']        : '[]';
@@ -151,6 +183,36 @@ $db->cdp_execute(); $r = $db->cdp_registro(); $context['pending_prealerts'] = $r
 $db->cdp_query("SELECT COUNT(*) as total FROM cdb_users WHERE userlevel=1 AND created >= NOW() - INTERVAL 7 DAY");
 $db->cdp_execute(); $r = $db->cdp_registro(); $context['new_customers_week'] = $r ? (int)$r->total : 0;
 
+// --- Full customer list ---
+$db->cdp_query("
+    SELECT u.id, u.fname, u.lname, u.email, u.phone,
+           COUNT(o.order_id) as total_shipments,
+           IFNULL(SUM(o.total_order),0) as total_spent,
+           MAX(o.order_date) as last_order
+    FROM cdb_users u
+    LEFT JOIN cdb_add_order o ON o.sender_id = u.id AND o.status_courier != 21
+    WHERE u.userlevel = 1 AND u.active = 1
+    GROUP BY u.id
+    ORDER BY u.fname ASC
+    LIMIT 100
+");
+$db->cdp_execute();
+$all_customers = $db->cdp_registros();
+$context['all_customers'] = [];
+$context['total_customers'] = 0;
+if ($all_customers) foreach ($all_customers as $r) {
+    $context['all_customers'][] = [
+        'id'              => (int)$r->id,
+        'name'            => trim($r->fname . ' ' . $r->lname),
+        'email'           => $r->email,
+        'phone'           => $r->phone,
+        'total_shipments' => (int)$r->total_shipments,
+        'total_spent'     => (float)$r->total_spent,
+        'last_order'      => $r->last_order,
+    ];
+    $context['total_customers']++;
+}
+
 // --- Currency ---
 $db->cdp_query("SELECT currency, for_symbol, for_currency FROM cdb_settings LIMIT 1");
 $db->cdp_execute();
@@ -185,6 +247,8 @@ Be concise, direct, and actionable. Use bullet points when listing items.
 Always refer to specific tracking numbers, customer names, and amounts from the data when relevant.
 Always use "{$currency}" as the currency symbol. Never use dollar sign or any other currency.
 
+When asked about customers/clients, use the "all_customers" array in the context data — it contains the full list with name, email, phone, total shipments, and total spent. The "total_customers" field shows the total count.
+
 {$autopilot_instructions}
 
 PERMISSIONS:
@@ -201,7 +265,73 @@ Specific rules:
 - Add "send_sms" button ONLY if you have ai_can_send_sms permission
 - Add "send_email" button ONLY if you have ai_can_send_email permission
 - Add "send_whatsapp" button ONLY if you have ai_can_send_whatsapp permission
+- Add "cancel_shipment" button ONLY if you have ai_can_cancel_shipments permission AND the user explicitly asks to cancel
+- Add "create_driver" button when user asks to create a driver
+- Add "create_customer" button when user asks to create a customer
+- Add "update_customer" button when user asks to update customer info
+- Add "add_charge" button when user asks to add a charge
+- Add "refund_payment" button when user asks to process a refund
+- Add "add_prealert" button when user asks to add a pre-alert
+- Add "schedule_pickup" button when user asks to schedule a pickup
+- Add "send_bulk_sms" button when user asks to send SMS to multiple customers
+- Add "generate_report" button when user asks to generate a report
+- Add "export_data" button when user asks to export data
+- Add "mark_delivered" button when user asks to mark a shipment as delivered (needs order_id, person_receives, driver_id)
+- Add "add_tracking_note" button when user asks to add a tracking update (needs order_id, status_id, comment)
+- Add "delete_shipment" button when user explicitly asks to delete a shipment
+- Add "bulk_update_status" button when user asks to update multiple shipments at once (needs order_ids comma-separated, status_id)
+- Add "bulk_assign_driver" button when user asks to assign one driver to multiple shipments (needs order_ids comma-separated, driver_id)
+- Add "mark_package_delivered" button when user asks to mark a package as delivered (needs package_id, person_receives, driver_id)
+- Add "update_consolidate_driver" button when user asks to assign driver to a consolidate order
+- Add "confirm_consolidate_payment" button when user asks to confirm payment for a consolidate order
+- Add "accept_pickup" button when user asks to accept a pickup request
+- Add "cancel_pickup" button when user asks to cancel a pickup
+- Add "delete_customer" button when user explicitly asks to delete a customer (requires confirm=DELETE)
+- Add "reset_customer_password" button when user asks to reset a customer password
+- Add "edit_driver" button when user asks to update driver info
+- Add "delete_driver" button when user explicitly asks to delete a driver (requires confirm=DELETE)
+- Add "report_payments_received" button when user asks for a payments received report
+- Add "report_driver_performance" button when user asks for driver performance/stats
+- Add "report_customer_balance" button when user asks for customer balance/debt report
+- Add "notify_sms_shipment" button when user asks to send SMS notification for a specific shipment
+- Add "record_payment" button when user asks to record/log a payment for an order
+- Add "delete_charge" button when user asks to delete a charge record
+- Add "create_recipient" button when user asks to create a new recipient/consignee
+- Add "delete_recipient" button when user explicitly asks to delete a recipient
+- Add "create_employee" button when user asks to create a new employee/staff account
+- Add "delete_employee" button when user explicitly asks to delete/deactivate an employee
+- Add "reset_employee_password" button when user asks to reset an employee password
+- Add "send_whatsapp_bulk" button when user asks to send WhatsApp to multiple people
+- Add "delete_prealert" button when user asks to delete a pre-alert
+- Add "update_consolidate_status" button when user asks to update status of a consolidate order
+- Add "report_general" button when user asks for a general/overview shipments report
+- Add "report_pickup_summary" button when user asks for pickup operations report
+- Add "report_packages_registered" button when user asks for customer packages report
 - If everything is fine and no action is needed, do NOT include ACTIONS_JSON at all
+
+When the user asks to create a customer, ALWAYS include a "create_customer" action with ALL data the user provided. Use these exact field names:
+  fname (first name), lname (last name), email, phone
+  Example: {"action":"create_customer","label":"Create Customer - NAME","fname":"John","lname":"Doe","email":"john@example.com","phone":"+250788000000"}
+  If a field wasn't mentioned, leave it as empty string "".
+
+When the user asks to create a driver, ALWAYS include a "create_driver" action with: fname, lname, email, phone, vehicle
+When the user asks to cancel a shipment, include "cancel_shipment" with: order_id, reason
+When the user asks to update a customer, include "update_customer" with: customer_id, phone/email/address (whichever was mentioned)
+When the user asks to add a charge, include "add_charge" with: customer_id, amount, description, due_date
+When the user asks to refund, include "refund_payment" with: order_id, amount, reason
+When the user asks to add a pre-alert, include "add_prealert" with: tracking, customer_id, description, weight
+When the user asks to schedule a pickup, include "schedule_pickup" with: customer_id, address, date, notes
+When the user asks to send bulk SMS, include "send_bulk_sms" with: filter (all/customer_id), message
+When the user asks to generate a report, include "generate_report" with: report_type, start_date, end_date
+When the user asks to export data, include "export_data" with: data_type, format
+When the user asks to record a payment, include "record_payment" with: order_id, amount, payment_type (method ID), notes
+When the user asks to create a recipient, include "create_recipient" with: fname, lname, phone, email, address
+When the user asks to create an employee/staff, include "create_employee" with: fname, lname, email, phone, username
+When the user asks to delete a pre-alert, include "delete_prealert" with: prealert_id
+When the user asks to update consolidate status, include "update_consolidate_status" with: consolidate_id, status_id, comment
+When the user asks for a general report, include "report_general" with: start_date, end_date, status_id
+When the user asks for a pickup report, include "report_pickup_summary" with: start_date, end_date, driver_id
+When the user asks for a packages report, include "report_packages_registered" with: start_date, end_date, customer_id
 
 When actions exist, append at the very end on one line:
 ACTIONS_JSON:[{"action":"confirm_payment","label":"Confirm Payment - TRACKING","order_id":REAL_ID,"order_type":"courier","description":"Confirm payment for TRACKING"},{"action":"update_status","label":"Mark In Transit - TRACKING","order_id":REAL_ID,"status_id":4,"order_type":"courier","description":"Update TRACKING to In Transit"}]
@@ -244,7 +374,11 @@ try {
 } catch (Exception $e) {}
 
 if (empty($api_key)) {
-    echo json_encode(['reply' => 'API key not configured. Go to AI Settings to add your key.', 'actions' => []]);
+    // No API key — use local fallback engine
+    $full_reply = cdp_local_ai_engine($message, $context, $currency, $perms);
+    $actions    = cdp_local_ai_actions($message, $context, $perms);
+    $output = ob_get_clean();
+    echo json_encode(['reply' => $full_reply, 'actions' => $actions]);
     exit;
 }
 
@@ -254,7 +388,7 @@ if (empty($api_key)) {
 $endpoint = ($provider === 'openai') ? 'https://api.openai.com/v1/chat/completions' : 'https://api.groq.com/openai/v1/chat/completions';
 $model    = ($provider === 'openai') ? 'gpt-4o' : 'llama-3.3-70b-versatile';
 
-$payload = json_encode(['model' => $model, 'messages' => $messages, 'max_tokens' => 600, 'temperature' => 0.4]);
+$payload = json_encode(['model' => $model, 'messages' => $messages, 'max_tokens' => 1200, 'temperature' => 0.4]);
 
 $ch = curl_init($endpoint);
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -269,7 +403,11 @@ $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 curl_close($ch);
 
 if ($http_code !== 200) {
-    echo json_encode(['reply' => 'AI error (HTTP ' . $http_code . '). Check your API key.', 'actions' => []]);
+    // API failed (rate limit, invalid key, service down) — use local fallback engine silently
+    $full_reply = cdp_local_ai_engine($message, $context, $currency, $perms);
+    $actions    = cdp_local_ai_actions($message, $context, $perms);
+    $output = ob_get_clean();
+    echo json_encode(['reply' => $full_reply, 'actions' => $actions]);
     exit;
 }
 
@@ -280,11 +418,37 @@ $full_reply = isset($result['choices'][0]['message']['content']) ? $result['choi
 // PARSE ACTIONS_JSON OUT OF REPLY
 // ------------------------------------------------------------------
 $actions = [];
-if (preg_match('/ACTIONS_JSON:(\[.*?\])/s', $full_reply, $matches)) {
-    $actions_raw = $matches[1];
+// Find ACTIONS_JSON: and extract everything after it
+if (preg_match('/ACTIONS_JSON:(.+)$/s', $full_reply, $matches)) {
+    $actions_raw = trim($matches[1]);
     $actions     = json_decode($actions_raw, true) ?: [];
-    // Remove ACTIONS_JSON block from the visible reply
-    $full_reply  = trim(preg_replace('/ACTIONS_JSON:\[.*?\]/s', '', $full_reply));
+    // Remove ACTIONS_JSON block from the visible reply - everything from ACTIONS_JSON onward
+    $full_reply  = trim(preg_replace('/ACTIONS_JSON:.+$/s', '', $full_reply));
+}
+
+// Clean output buffer and send JSON
+$output = ob_get_clean();
+if (!empty($output)) {
+    // Log any unexpected output
+    error_log("P-AI Warning: Unexpected output before JSON: " . substr($output, 0, 200));
 }
 
 echo json_encode(['reply' => $full_reply, 'actions' => $actions]);
+exit;
+
+} catch (Exception $e) {
+    // Catch any PHP errors and return them as JSON
+    ob_end_clean(); // Clear any buffered output
+    error_log("P-AI Error: " . $e->getMessage() . " in " . $e->getFile() . " on line " . $e->getLine());
+    echo json_encode([
+        'error' => 'Server error: ' . $e->getMessage(),
+        'reply' => 'An error occurred while processing your request. Check PHP error logs.',
+        'actions' => [],
+        'debug' => [
+            'message' => $e->getMessage(),
+            'file' => basename($e->getFile()),
+            'line' => $e->getLine()
+        ]
+    ]);
+    exit;
+}
