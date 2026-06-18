@@ -290,7 +290,87 @@ $office = $core->cdp_getOffices();
 										</div>
 
 									</section>
-									<div class="form-group">
+
+								<!-- ── AI Permissions (shown for admin/employee roles) ── -->
+								<div id="ai-perms-section" style="display:none;">
+									<hr/>
+									<h4 style="font-size:14px; font-weight:700; color:#495057; margin-bottom:4px;">
+										<i class="ti-lock" style="color:#0d6efd;"></i> Pryro AI Permissions
+									</h4>
+									<p style="font-size:12px; color:#6c757d; margin-bottom:14px;">
+										Set this user's AI capabilities. Leave as <strong>Inherit</strong> to follow global AI Settings.
+									</p>
+									<div style="margin-bottom:12px;">
+										<div style="background:#f0f4ff; border:1px solid #c5d6ff; border-radius:8px; padding:10px 14px; display:flex; align-items:center; justify-content:space-between;">
+											<div>
+												<strong style="font-size:12px; color:#0d6efd;"><i class="ti-shield"></i> AI Panel Access</strong>
+												<div style="font-size:11px; color:#6c757d;">Can this user open and use the AI assistant?</div>
+											</div>
+											<select name="ai_access" class="form-control form-control-sm" style="width:130px;">
+												<option value="">Inherit</option>
+												<option value="1">✅ Enabled</option>
+												<option value="0">❌ Disabled</option>
+											</select>
+										</div>
+									</div>
+									<?php
+									$ai_groups_add = [
+										'Actions' => [
+											['field'=>'ai_can_assign_drivers',  'label'=>'Assign Drivers',   'icon'=>'ti-truck'],
+											['field'=>'ai_can_confirm_payments','label'=>'Confirm Payments', 'icon'=>'ti-money'],
+											['field'=>'ai_can_update_status',   'label'=>'Update Status',    'icon'=>'ti-reload'],
+											['field'=>'ai_can_create_shipments','label'=>'Create Shipments', 'icon'=>'ti-package'],
+											['field'=>'ai_can_edit_shipments',  'label'=>'Edit Shipments',   'icon'=>'ti-pencil'],
+											['field'=>'ai_can_cancel_shipments','label'=>'Cancel Shipments', 'icon'=>'ti-close'],
+										],
+										'Communication' => [
+											['field'=>'ai_can_send_sms',     'label'=>'Send SMS',       'icon'=>'ti-mobile'],
+											['field'=>'ai_can_send_email',   'label'=>'Send Email',     'icon'=>'ti-email'],
+											['field'=>'ai_can_send_whatsapp','label'=>'Send WhatsApp',  'icon'=>'ti-comment'],
+										],
+										'Reporting & Finance' => [
+											['field'=>'ai_can_generate_reports','label'=>'Generate Reports', 'icon'=>'ti-bar-chart'],
+											['field'=>'ai_can_export_data',     'label'=>'Export Data',      'icon'=>'ti-download'],
+											['field'=>'ai_can_create_customers','label'=>'Create Customers', 'icon'=>'ti-user-add'],
+											['field'=>'ai_can_edit_customers',  'label'=>'Edit Customers',   'icon'=>'ti-pencil-alt'],
+											['field'=>'ai_can_process_refunds', 'label'=>'Process Refunds',  'icon'=>'ti-money'],
+											['field'=>'ai_can_apply_discounts', 'label'=>'Apply Discounts',  'icon'=>'ti-tag'],
+										],
+									];
+									foreach ($ai_groups_add as $gname => $gitems):
+									?>
+									<div style="margin-bottom:8px;">
+										<div style="font-size:10px; font-weight:700; color:#6c757d; text-transform:uppercase; letter-spacing:1px; margin-bottom:5px;"><?php echo $gname; ?></div>
+										<div style="display:grid; grid-template-columns:1fr 1fr; gap:5px;">
+											<?php foreach ($gitems as $p): ?>
+											<div style="background:#fff; border:1px solid #e9ecef; border-radius:6px; padding:7px 10px; display:flex; align-items:center; justify-content:space-between;">
+												<div style="display:flex; align-items:center; gap:7px;">
+													<i class="<?php echo $p['icon']; ?>" style="color:#0d6efd; font-size:12px;"></i>
+													<span style="font-size:11px; color:#495057;"><?php echo $p['label']; ?></span>
+												</div>
+												<select name="<?php echo $p['field']; ?>" class="form-control form-control-sm" style="width:110px; font-size:11px;">
+													<option value="">Inherit</option>
+													<option value="1">✅ Allow</option>
+													<option value="0">❌ Deny</option>
+												</select>
+											</div>
+											<?php endforeach; ?>
+										</div>
+									</div>
+									<?php endforeach; ?>
+									<hr/>
+								</div>
+
+								<script>
+								(function(){
+									var sel = document.getElementById('userlevel');
+									function toggle(){ var v=sel?sel.value:''; document.getElementById('ai-perms-section').style.display=(v=='9'||v=='2')?'':'none'; }
+									if(sel) sel.addEventListener('change', toggle);
+									document.addEventListener('DOMContentLoaded', toggle);
+								})();
+								</script>
+
+								<div class="form-group">
 										<div class="col-sm-12">
 											<button class="btn btn-outline-primary btn-confirmation" id="save_data" name="save_data" type="submit"><?php echo $lang['user_manage37'] ?><span><i class="icon-ok"></i></span></button>
 											<a href="users_list.php" class="btn btn-outline-secondary btn-confirmation"><span><i class="ti-share-alt"></i></span> <?php echo $lang['user_manage30'] ?></a>

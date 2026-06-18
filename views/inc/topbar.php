@@ -38,7 +38,13 @@
 				<!-- ============================================================== -->
 				<ul class="navbar-nav float-right">
 					<!-- P-AI Button -->
-					<?php if ($userData->userlevel == 9 || $userData->userlevel == 2): ?>
+					<?php
+					// Check per-user AI access: NULL = inherit (allowed for admins/employees), 0 = explicitly denied, 1 = explicitly allowed
+					$_ai_access = isset($userData->ai_access) ? $userData->ai_access : null;
+					$_show_ai   = ($userData->userlevel == 9) // super admin always sees it
+					           || ($userData->userlevel == 2 && $_ai_access !== '0' && $_ai_access !== 0); // employee unless explicitly denied
+					if ($_show_ai):
+					?>
 					<li class="nav-item mr-2" style="display:flex; align-items:center;">
 						<button onclick="cdp_openPAI()" id="btn-pryro-ai" style="background:#0d6efd; color:#fff; border:none; font-size:8px; font-weight:700; padding:3px 8px; border-radius:20px; letter-spacing:0.5px; cursor:pointer; transition: all 0.2s ease; white-space:nowrap; overflow:hidden; max-width:24px;"
 						onmouseenter="this.style.maxWidth='70px'; this.innerHTML='PRYRO AI';"
@@ -195,6 +201,7 @@
 	<!-- <script src="dataJs/load_notifications_all.js"> </script> -->
 
 <!-- P-AI Modal -->
+<?php if ($_show_ai): ?>
 <div class="modal fade" id="modal-pai" tabindex="-1" role="dialog" aria-hidden="true">
     <div class="modal-dialog modal-lg" id="pai-modal-dialog" role="document" style="transition: all 0.2s ease;">
         <div class="modal-content" style="border-radius:8px; overflow:hidden; display:flex; flex-direction:column; height:100%; box-shadow: 0 10px 40px rgba(0,0,0,0.2);">

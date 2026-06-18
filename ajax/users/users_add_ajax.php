@@ -136,6 +136,30 @@ if (empty($errors)) {
 
         $recipient_id = $db->dbh->lastInsertId();
 
+        // ── Save AI permissions for new user (if level 9 or 2) ──────
+        if ($recipient_id && in_array(intval($_POST['userlevel']), [9, 2])) {
+            $ai_fields = [
+                'ai_access', 'ai_can_assign_drivers', 'ai_can_confirm_payments',
+                'ai_can_update_status', 'ai_can_create_shipments', 'ai_can_edit_shipments',
+                'ai_can_cancel_shipments', 'ai_can_send_sms', 'ai_can_send_email',
+                'ai_can_send_whatsapp', 'ai_can_generate_reports', 'ai_can_export_data',
+                'ai_can_create_customers', 'ai_can_edit_customers',
+                'ai_can_process_refunds', 'ai_can_apply_discounts',
+            ];
+            $ai_updates = []; $ai_binds = [':id' => (int)$recipient_id];
+            foreach ($ai_fields as $f) {
+                if (isset($_POST[$f]) && $_POST[$f] !== '') {
+                    $ai_updates[] = "`$f`=:$f";
+                    $ai_binds[":$f"] = (int)$_POST[$f];
+                }
+            }
+            if (!empty($ai_updates)) {
+                $db->cdp_query("UPDATE cdb_users SET " . implode(',', $ai_updates) . " WHERE id=:id");
+                foreach ($ai_binds as $k => $v) $db->bind($k, $v);
+                $db->cdp_execute();
+            }
+        }
+
 
 
         if (!empty($_POST['notify']) && $_POST['notify'] == 1) {

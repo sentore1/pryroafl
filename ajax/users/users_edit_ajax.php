@@ -118,6 +118,36 @@ if (CDP_APP_MODE_DEMO === true) {
             'id' => cdp_sanitize($_POST['id'])
         );
 
+        // ── AI Permissions — save per-user overrides ──────────────────
+        $ai_fields = [
+            'ai_access', 'ai_can_assign_drivers', 'ai_can_confirm_payments',
+            'ai_can_update_status', 'ai_can_create_shipments', 'ai_can_edit_shipments',
+            'ai_can_cancel_shipments', 'ai_can_send_sms', 'ai_can_send_email',
+            'ai_can_send_whatsapp', 'ai_can_generate_reports', 'ai_can_export_data',
+            'ai_can_create_customers', 'ai_can_edit_customers',
+            'ai_can_process_refunds', 'ai_can_apply_discounts',
+        ];
+        $ai_updates = [];
+        $ai_binds   = [':id' => (int)$_POST['id']];
+        foreach ($ai_fields as $f) {
+            if (isset($_POST[$f]) && $_POST[$f] !== '') {
+                // Explicit value (0 or 1)
+                $ai_updates[] = "`$f`=:$f";
+                $ai_binds[":$f"] = (int)$_POST[$f];
+            } elseif (array_key_exists($f, $_POST)) {
+                // Empty string submitted = reset to NULL (inherit global)
+                $ai_updates[] = "`$f`=NULL";
+            }
+        }
+        if (!empty($ai_updates)) {
+            $db = new Conexion;
+            $db->cdp_query("UPDATE cdb_users SET " . implode(',', $ai_updates) . " WHERE id=:id");
+            foreach ($ai_binds as $k => $v) {
+                if ($v !== 'NULL') $db->bind($k, $v);
+            }
+            $db->cdp_execute();
+        }
+
         $userDataEdit = cdp_getUserEdit4bozo($_POST['id']);
 
         if ($_POST['password'] != "") {

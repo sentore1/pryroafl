@@ -437,6 +437,91 @@ $office = $core->cdp_getOffices();
 												</div>
 
 											</section>
+
+											<?php if (in_array($row_user->userlevel, [9, 2])): ?>
+											<!-- ── AI Permissions Section ─────────────────────────── -->
+											<hr/>
+											<section>
+												<div class="row">
+													<div class="col-md-12">
+														<h4 style="font-size:14px; font-weight:700; color:#495057; margin-bottom:4px;">
+															<i class="ti-lock" style="color:#0d6efd;"></i> Pryro AI Permissions
+														</h4>
+														<p style="font-size:12px; color:#6c757d; margin-bottom:16px;">
+															Control what this user can do via the AI assistant. <strong>Inherit</strong> = follows global AI Settings.
+														</p>
+													</div>
+												</div>
+
+												<!-- AI Panel Access -->
+												<div class="row" style="margin-bottom:12px;">
+													<div class="col-md-12">
+														<div style="background:#f0f4ff; border:1px solid #c5d6ff; border-radius:8px; padding:12px 16px; display:flex; align-items:center; justify-content:space-between;">
+															<div>
+																<strong style="font-size:13px; color:#0d6efd;"><i class="ti-shield"></i> AI Panel Access</strong>
+																<div style="font-size:11px; color:#6c757d;">Can this user open and use the AI assistant?</div>
+															</div>
+															<select name="ai_access" class="form-control form-control-sm" style="width:140px;">
+																<option value="" <?php if($row_user->ai_access === null) echo 'selected'; ?>>Inherit</option>
+																<option value="1" <?php if($row_user->ai_access === '1' || $row_user->ai_access === 1) echo 'selected'; ?>>✅ Enabled</option>
+																<option value="0" <?php if($row_user->ai_access === '0' || $row_user->ai_access === 0) echo 'selected'; ?>>❌ Disabled</option>
+															</select>
+														</div>
+													</div>
+												</div>
+
+												<?php
+												$ai_perms_ui = [
+													['field'=>'ai_can_assign_drivers',   'label'=>'Assign Drivers',    'icon'=>'ti-truck',      'group'=>'Actions'],
+													['field'=>'ai_can_confirm_payments', 'label'=>'Confirm Payments',  'icon'=>'ti-money',      'group'=>'Actions'],
+													['field'=>'ai_can_update_status',    'label'=>'Update Status',     'icon'=>'ti-reload',     'group'=>'Actions'],
+													['field'=>'ai_can_create_shipments', 'label'=>'Create Shipments',  'icon'=>'ti-package',    'group'=>'Actions'],
+													['field'=>'ai_can_edit_shipments',   'label'=>'Edit Shipments',    'icon'=>'ti-pencil',     'group'=>'Actions'],
+													['field'=>'ai_can_cancel_shipments', 'label'=>'Cancel Shipments',  'icon'=>'ti-close',      'group'=>'Actions'],
+													['field'=>'ai_can_send_sms',         'label'=>'Send SMS',          'icon'=>'ti-mobile',     'group'=>'Communication'],
+													['field'=>'ai_can_send_email',       'label'=>'Send Email',        'icon'=>'ti-email',      'group'=>'Communication'],
+													['field'=>'ai_can_send_whatsapp',    'label'=>'Send WhatsApp',     'icon'=>'ti-comment',    'group'=>'Communication'],
+													['field'=>'ai_can_generate_reports', 'label'=>'Generate Reports',  'icon'=>'ti-bar-chart',  'group'=>'Reporting'],
+													['field'=>'ai_can_export_data',      'label'=>'Export Data',       'icon'=>'ti-download',   'group'=>'Reporting'],
+													['field'=>'ai_can_create_customers', 'label'=>'Create Customers',  'icon'=>'ti-user-add',   'group'=>'Customer Mgmt'],
+													['field'=>'ai_can_edit_customers',   'label'=>'Edit Customers',    'icon'=>'ti-pencil-alt', 'group'=>'Customer Mgmt'],
+													['field'=>'ai_can_process_refunds',  'label'=>'Process Refunds',   'icon'=>'ti-money',      'group'=>'Financial'],
+													['field'=>'ai_can_apply_discounts',  'label'=>'Apply Discounts',   'icon'=>'ti-tag',        'group'=>'Financial'],
+												];
+												$grouped = [];
+												foreach ($ai_perms_ui as $p) $grouped[$p['group']][] = $p;
+												foreach ($grouped as $group_name => $items):
+												?>
+												<div class="row" style="margin-bottom:8px;">
+													<div class="col-md-12">
+														<div style="font-size:11px; font-weight:700; color:#6c757d; text-transform:uppercase; letter-spacing:1px; margin-bottom:6px;">
+															<?php echo $group_name; ?>
+														</div>
+														<div style="display:grid; grid-template-columns:1fr 1fr; gap:6px;">
+															<?php foreach ($items as $p):
+																$val = isset($row_user->{$p['field']}) ? $row_user->{$p['field']} : null;
+															?>
+															<div style="background:#fff; border:1px solid #e9ecef; border-radius:6px; padding:8px 12px; display:flex; align-items:center; justify-content:space-between;">
+																<div style="display:flex; align-items:center; gap:8px;">
+																	<i class="<?php echo $p['icon']; ?>" style="color:#0d6efd; font-size:13px; width:16px;"></i>
+																	<span style="font-size:11px; color:#495057;"><?php echo $p['label']; ?></span>
+																</div>
+																<select name="<?php echo $p['field']; ?>" class="form-control form-control-sm" style="width:120px; font-size:11px;">
+																	<option value="" <?php if($val === null || $val === '') echo 'selected'; ?>>Inherit</option>
+																	<option value="1" <?php if($val === '1' || $val === 1) echo 'selected'; ?>>✅ Allow</option>
+																	<option value="0" <?php if($val === '0' || $val === 0) echo 'selected'; ?>>❌ Deny</option>
+																</select>
+															</div>
+															<?php endforeach; ?>
+														</div>
+													</div>
+												</div>
+												<?php endforeach; ?>
+
+											</section>
+											<hr/>
+											<?php endif; ?>
+
 											<div class="form-group">
 												<div class="col-sm-12">
 													<button class="btn btn-outline-primary btn-confirmation" name="dosubmit" type="submit"><?php echo $lang['user-account20'] ?><span><i class="icon-ok"></i></span></button>
