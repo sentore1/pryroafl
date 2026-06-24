@@ -706,6 +706,9 @@ function cdp_openPAI() {
     cdp_loadPAISettings();
     $('#modal-pai').modal('show');
     
+    // Pre-load permissions in background so they're ready instantly
+    cdp_loadAIPermissions();
+
     // Focus input field after modal is fully shown
     setTimeout(function() {
         $('#pai-chat-input').focus();
@@ -1762,11 +1765,21 @@ $(document).on('input', '#pai-chat-input', function() {
 });
 
 // Settings functions
+var paiSettingsOpen = false;
+var paiPermissionsCache = null;
+
 function cdp_togglePAISettings() {
-    $('#pai-settings-panel').slideToggle(200);
-    // Load permissions when opening
-    if ($('#pai-settings-panel').is(':visible')) {
-        cdp_loadAIPermissions();
+    paiSettingsOpen = !paiSettingsOpen;
+    if (paiSettingsOpen) {
+        $('#pai-settings-panel').slideDown(200);
+        // Use cache if already loaded, otherwise fetch
+        if (paiPermissionsCache) {
+            cdp_renderPermissions(paiPermissionsCache);
+        } else {
+            cdp_loadAIPermissions();
+        }
+    } else {
+        $('#pai-settings-panel').slideUp(200);
     }
 }
 
@@ -1780,6 +1793,7 @@ function cdp_loadAIPermissions() {
         dataType: 'json',
         success: function(data) {
             if (data.success) {
+                paiPermissionsCache = data.permissions; // cache for instant re-open
                 cdp_renderPermissions(data.permissions);
             } else {
                 $('#pai-permissions-loading').html('<div style="color:#dc3545; font-size:12px;"><i class="ti-alert"></i> Failed to load permissions</div>');
@@ -1814,15 +1828,18 @@ function cdp_renderPermissions(perms) {
     
     // Permission Categories
     var categories = [
-        {title: 'Core Actions', icon: 'ti-bolt', key: 'actions', data: perms.actions, color: '#0d6efd'},
-        {title: 'Communication', icon: 'ti-email', key: 'communication', data: perms.communication, color: '#17a2b8'},
-        {title: 'Customer Management', icon: 'ti-user', key: 'customer_management', data: perms.customer_management, color: '#6f42c1'},
-        {title: 'Financial', icon: 'ti-money', key: 'financial', data: perms.financial, color: '#28a745'},
-        {title: 'Reporting', icon: 'ti-file', key: 'reporting', data: perms.reporting, color: '#fd7e14'},
-        {title: 'Advanced', icon: 'ti-rocket', key: 'advanced', data: perms.advanced, color: '#e83e8c'}
+        {title: 'Core Actions',          icon: 'ti-bolt',    key: 'actions',              data: perms.actions,              color: '#0d6efd'},
+        {title: 'Communication',         icon: 'ti-email',   key: 'communication',         data: perms.communication,        color: '#17a2b8'},
+        {title: 'Customer Management',   icon: 'ti-user',    key: 'customer_management',   data: perms.customer_management,  color: '#6f42c1'},
+        {title: 'Financial',             icon: 'ti-money',   key: 'financial',             data: perms.financial,            color: '#28a745'},
+        {title: 'Reporting',             icon: 'ti-file',    key: 'reporting',             data: perms.reporting,            color: '#fd7e14'},
+        {title: 'Advanced',              icon: 'ti-rocket',  key: 'advanced',              data: perms.advanced,             color: '#e83e8c'}
     ];
     
     categories.forEach(function(cat) {
+        // Skip categories missing from server response
+        if (!cat.data || typeof cat.data !== 'object') return;
+
         var enabled = Object.values(cat.data).filter(function(v) { return v === true; }).length;
         var total = Object.keys(cat.data).length;
         
@@ -2023,6 +2040,8 @@ function cdp_playNotificationSound() {
 $('#modal-pai').on('hidden.bs.modal', function() {
     paiHistory = [];
     paiFullscreen = false;
+    paiSettingsOpen = false;
+    paiPermissionsCache = null; // clear cache so next open re-fetches fresh data
     $('#pai-settings-panel').hide();
     $('#pai-modal-dialog').css({ 'position':'', 'top':'', 'left':'', 'right':'', 'bottom':'', 'max-width':'', 'width':'', 'height':'', 'margin':'', 'padding':'', 'z-index':'' });
     $('.modal-content', '#pai-modal-dialog').css('height','');
@@ -2248,3 +2267,4 @@ function cdp_createAlertCard(text, type, icon) {
     return html;
 }
 </script>
+<?php endif; // $_show_ai ?>

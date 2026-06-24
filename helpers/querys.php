@@ -5116,8 +5116,8 @@ function cdp_verifyRangeTariffsExist($origin, $destiny, $initial_range, $final_r
     }
 
     $sql = "SELECT * FROM cdb_shipping_fees 
-    WHERE (origin=$origin AND destiny=$destiny)
-    AND ($initial_range BETWEEN initial_range AND final_range) and ($final_range between initial_range AND final_range)
+    WHERE (origin='$origin' AND destiny='$destiny')
+    AND ($initial_range BETWEEN initial_range AND final_range) AND ($final_range BETWEEN initial_range AND final_range)
     $where";
 
     $db->cdp_query($sql);

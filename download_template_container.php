@@ -27,7 +27,11 @@ $output = fopen('php://output', 'w');
 // Add BOM for UTF-8
 fprintf($output, chr(0xEF).chr(0xBB).chr(0xBF));
 
-// Headers
+// Determine which measurement mode is active
+$show_dimensions = isset($core->show_package_dimensions) ? (int)$core->show_package_dimensions : 1;
+$show_cbm_input  = isset($core->show_cbm_input_field)    ? (int)$core->show_cbm_input_field    : 0;
+
+// Build headers based on active mode
 $headers = array(
     'sender_email',
     'sender_fname',
@@ -39,26 +43,46 @@ $headers = array(
     'tracking_number',
     'item_description',
     'weight',
-    'length',
-    'width',
-    'height',
+);
+
+if ($show_dimensions) {
+    $headers[] = 'length';
+    $headers[] = 'width';
+    $headers[] = 'height';
+}
+if ($show_cbm_input) {
+    $headers[] = 'cbm';
+}
+
+$headers = array_merge($headers, array(
     'sender_country',
     'sender_city',
     'sender_address',
     'recipient_country',
     'recipient_city',
-    'recipient_address'
-);
+    'recipient_address',
+));
 
 fputcsv($output, $headers);
 
-// Sample data rows - REPLACE WITH YOUR ACTUAL DATA
-// These are examples only - you must replace with real data from your system
-$sample_data = array(
-    array('client1@company.com', 'John', 'Smith', 'customer1@email.com', 'Jane', 'Doe', 'CDPE', '100001', 'Electronics - Laptop', '2.5', '15', '10', '5', 'USA', 'New York', '123 Main St', 'Canada', 'Toronto', '456 Oak Ave'),
-    array('client2@business.com', 'Michael', 'Johnson', 'customer2@email.com', 'Sarah', 'Williams', 'CDPE', '100002', 'Clothing - 5 Shirts', '4.0', '20', '15', '8', 'USA', 'Los Angeles', '789 Pine Rd', 'Mexico', 'Mexico City', '321 Elm St'),
-    array('client3@shop.com', 'David', 'Brown', 'customer3@email.com', 'Emily', 'Davis', 'CDPE', '100003', 'Documents', '6.5', '25', '18', '12', 'Canada', 'Vancouver', '555 Maple Dr', 'USA', 'Seattle', '777 Cedar Ln')
-);
+// Sample data rows
+if ($show_dimensions && !$show_cbm_input) {
+    $sample_data = array(
+        array('client1@company.com', 'John', 'Smith', 'customer1@email.com', 'Jane', 'Doe', 'CDPE', '100001', 'Electronics - Laptop', '2.5', '15', '10', '5', 'USA', 'New York', '123 Main St', 'Canada', 'Toronto', '456 Oak Ave'),
+        array('client2@business.com', 'Michael', 'Johnson', 'customer2@email.com', 'Sarah', 'Williams', 'CDPE', '100002', 'Clothing - 5 Shirts', '4.0', '20', '15', '8', 'USA', 'Los Angeles', '789 Pine Rd', 'Mexico', 'Mexico City', '321 Elm St'),
+    );
+} elseif (!$show_dimensions && $show_cbm_input) {
+    $sample_data = array(
+        array('client1@company.com', 'John', 'Smith', 'customer1@email.com', 'Jane', 'Doe', 'CDPE', '100001', 'Electronics - Laptop', '2.5', '0.0075', 'USA', 'New York', '123 Main St', 'Canada', 'Toronto', '456 Oak Ave'),
+        array('client2@business.com', 'Michael', 'Johnson', 'customer2@email.com', 'Sarah', 'Williams', 'CDPE', '100002', 'Clothing - 5 Shirts', '4.0', '0.0240', 'USA', 'Los Angeles', '789 Pine Rd', 'Mexico', 'Mexico City', '321 Elm St'),
+    );
+} else {
+    // Both enabled
+    $sample_data = array(
+        array('client1@company.com', 'John', 'Smith', 'customer1@email.com', 'Jane', 'Doe', 'CDPE', '100001', 'Electronics - Laptop', '2.5', '15', '10', '5', '0.0075', 'USA', 'New York', '123 Main St', 'Canada', 'Toronto', '456 Oak Ave'),
+        array('client2@business.com', 'Michael', 'Johnson', 'customer2@email.com', 'Sarah', 'Williams', 'CDPE', '100002', 'Clothing - 5 Shirts', '4.0', '20', '15', '8', '0.0240', 'USA', 'Los Angeles', '789 Pine Rd', 'Mexico', 'Mexico City', '321 Elm St'),
+    );
+}
 
 foreach ($sample_data as $row) {
     fputcsv($output, $row);

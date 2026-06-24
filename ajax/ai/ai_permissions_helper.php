@@ -156,6 +156,10 @@ class AIPermissions {
                 'process_refunds'  => $this->canProcessRefunds(),
                 'apply_discounts'  => $this->canApplyDiscounts(),
             ],
+            'advanced' => [
+                'predict_analytics' => $this->canPredictAnalytics(),
+                'optimize_routes'   => $this->canOptimizeRoutes(),
+            ],
         ];
     }
 

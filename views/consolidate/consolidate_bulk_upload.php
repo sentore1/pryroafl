@@ -73,9 +73,14 @@ $settings = cdp_getSettingsCourier();
                                         <li><strong>tracking_prefix</strong> - Tracking prefix (e.g., CDPE)</li>
                                         <li><strong>item_description</strong> - Description of the package contents (e.g., Electronics, Clothing, Documents)</li>
                                         <li><strong>weight</strong> - Package weight</li>
+                                        <?php if (!isset($core->show_package_dimensions) || $core->show_package_dimensions == 1): ?>
                                         <li><strong>length</strong> - Package length</li>
                                         <li><strong>width</strong> - Package width</li>
                                         <li><strong>height</strong> - Package height</li>
+                                        <?php endif; ?>
+                                        <?php if (isset($core->show_cbm_input_field) && $core->show_cbm_input_field == 1): ?>
+                                        <li><strong>cbm</strong> - Package CBM (Cubic Meter) value <span class="badge badge-info">CBM Mode</span></li>
+                                        <?php endif; ?>
                                         <li><strong>sender_country</strong> - Origin country</li>
                                         <li><strong>sender_city</strong> - Origin city</li>
                                         <li><strong>sender_address</strong> - Origin address</li>
@@ -93,6 +98,21 @@ $settings = cdp_getSettingsCourier();
                                             <li>Find tracking numbers in: <a href="consolidate_list.php" target="_blank">Consolidate List</a></li>
                                         </ul>
                                     </div>
+                                    <?php if (!isset($core->show_package_dimensions) || $core->show_package_dimensions == 1): ?>
+                                    <?php if (isset($core->show_cbm_input_field) && $core->show_cbm_input_field == 1): ?>
+                                    <div class="alert alert-info mt-2">
+                                        <i class="fas fa-cube"></i> <strong>Both modes active:</strong> Template includes length/width/height and cbm columns.
+                                    </div>
+                                    <?php else: ?>
+                                    <div class="alert alert-info mt-2">
+                                        <i class="fas fa-ruler-combined"></i> <strong>Dimension Mode:</strong> Provide length, width, and height. Volumetric weight will be calculated automatically.
+                                    </div>
+                                    <?php endif; ?>
+                                    <?php else: ?>
+                                    <div class="alert alert-info mt-2">
+                                        <i class="fas fa-cube"></i> <strong>CBM Mode:</strong> Provide the CBM value directly. Length/width/height are not required.
+                                    </div>
+                                    <?php endif; ?>
                                     <a href="download_template_container.php" class="btn btn-sm btn-success"><i class="fas fa-download"></i> Download Template</a>
                                 </div>
 

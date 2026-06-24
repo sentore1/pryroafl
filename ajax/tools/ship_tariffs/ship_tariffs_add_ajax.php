@@ -18,8 +18,9 @@
 // * here- http://codecanyon.net/licenses/standard                         *
 // *                                                                       *
 // *************************************************************************
- 
 
+// Buffer ALL output so any stray whitespace/HTML from includes cannot corrupt the JSON response
+ob_start();
 
 require_once("../../../loader.php");
 require_once("../../../helpers/querys.php");
@@ -51,6 +52,16 @@ if (empty($_POST['tariff_price']))
     
 $response = array();
 
+// If server-side validation caught missing fields, return them as JSON errors
+if (!empty($errors)) {
+    $response['status'] = 'error';
+    $response['message'] = $lang['message_ajax_error2'];
+    ob_end_clean(); // discard any stray output from includes
+    header('Content-type: application/json; charset=UTF-8');
+    echo json_encode($response);
+    exit;
+}
+
 if (isset($_POST['initial_range'], $_POST['final_range']) && ($_POST['final_range'] < $_POST['initial_range'])) {
     $response['status'] = 'error';
     $response['message'] = $lang['validate_field_ajax8'];
@@ -72,7 +83,6 @@ if (!isset($response['status'])) {
         'city_destinycities' => cdp_sanitize($_POST['city_destinycities'])
     );
 
-
     $insert = cdp_insertTariffs($data);
 
     if ($insert) {
@@ -84,51 +94,7 @@ if (!isset($response['status'])) {
     }
 }
 
+ob_end_clean(); // discard any stray output from includes
 header('Content-type: application/json; charset=UTF-8');
 echo json_encode($response);
-
-if (!empty($errors)) {
-?>
-    <div class="alert alert-danger" id="success-alert">
-        <p><span class="icon-minus-sign"></span><i class="close icon-remove-circle"></i>
-            <?php echo $lang['message_ajax_error2']; ?>
-        <ul class="error">
-            <?php
-            foreach ($errors as $error) { ?>
-                <li>
-                    <i class="icon-double-angle-right"></i>
-                    <?php
-                    echo $error;
-
-                    ?>
-
-                </li>
-            <?php
-
-            }
-            ?>
-        </ul>
-        </p>
-    </div>
-<?php
-}
-
-if (isset($messages)) {
-
-?>
-    <div class="alert alert-info" id="success-alert">
-        <p><span class="icon-info-sign"></span><i class="close icon-remove-circle"></i>
-            <?php
-            foreach ($messages as $message) {
-                echo $message;
-            }
-            ?>
-            <script>
-                $("#save_data")[0].reset();
-            </script>
-        </p>
-    </div>
-
-<?php
-}
-?>
+exit;

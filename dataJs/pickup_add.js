@@ -52,6 +52,11 @@ $(function () {
   cdp_select2_init_sender_address();
   cdp_select2_init_recipient_address();
   cdp_select2_init_recipient();
+
+  // CSV import listener — more reliable than inline onchange
+  $(document).on("change", "#csv_import_input", function () {
+    importPackagesFromCSV(this);
+  });
 });
 
 function cdp_load_countries(modal) {
@@ -531,21 +536,34 @@ function importPackagesFromCSV(input) {
   var reader = new FileReader();
   reader.onload = function (e) {
     var lines = e.target.result.split("\n").filter(function (l) { return l.trim() !== ""; });
+    if (lines.length < 2) return;
+
+    // Parse headers from first row to build a name→index map
+    var headers = lines[0].split(",").map(function(h) { return h.trim().replace(/^\uFEFF/, "").toLowerCase(); });
+    var idx = {};
+    headers.forEach(function(h, i) { idx[h] = i; });
+
+    var imported = [];
     for (var i = 1; i < lines.length; i++) {
       var cols = lines[i].split(",");
-      if (cols.length < 8) continue;
-      packagesItems.push({
-        qty:            parseFloat(cols[0]) || 1,
-        description:    cols[1] ? cols[1].trim() : "",
-        weight:         parseFloat(cols[2]) || 0,
-        length:         parseFloat(cols[3]) || 0,
-        width:          parseFloat(cols[4]) || 0,
-        height:         parseFloat(cols[5]) || 0,
-        fixed_value:    parseFloat(cols[6]) || 0,
-        declared_value: parseFloat(cols[7]) || 0,
-        cbm_value:      parseFloat(cols[8]) || 0,
+      if (cols.length < 3) continue;
+      imported.push({
+        qty:            parseFloat(cols[idx['qty']])            || 1,
+        description:    cols[idx['description']] ? cols[idx['description']].trim() : "",
+        weight:         parseFloat(cols[idx['weight']])         || 0,
+        length:         parseFloat(cols[idx['length']])         || 0,
+        width:          parseFloat(cols[idx['width']])          || 0,
+        height:         parseFloat(cols[idx['height']])         || 0,
+        cbm_value:      parseFloat(cols[idx['cbm']])            || 0,
+        fixed_value:    parseFloat(cols[idx['fixed_charge']])   || 0,
+        declared_value: parseFloat(cols[idx['declared_value']]) || 0,
       });
     }
+
+    if (imported.length > 0) {
+      packagesItems = imported;
+    }
+
     loadPackages();
     calculateFinalTotal();
     input.value = "";

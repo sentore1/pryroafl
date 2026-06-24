@@ -12,6 +12,7 @@ var packagesItems = [
     weight: 0,
     declared_value: 0,
     fixed_value: 0,
+    cbm_value: 0,
   },
 ];
 
@@ -297,6 +298,10 @@ $("input[type=file]").on("change", function () {
 
 function loadPackages() {
   $("#data_items").html("");
+
+  var show_dimensions = $("#show_package_dimensions").val() == "1";
+  var show_cbm_input = $("#show_cbm_input_field").val() == "1";
+
   packagesItems.forEach(function (item, index) {
     var html_code = "";
     html_code += '<div  class= "card-hover" id="row_id_' + index + '">';
@@ -356,74 +361,97 @@ function loadPackages() {
       "</div>" +
       "</div>";
 
-    html_code +=
-      '<div class="col-sm-12 col-md-6 col-lg-1">' +
-      '<div class="form-group">' +
-      '<label for="emailAddress1"> ' +
-      translate_length +
-      "</label>" +
-      '<div class="input-group">' +
-      '<input type="text" onchange="changePackage(this)" value="' +
-      item.length +
-      '" onkeypress="return isNumberKey(event, this)" name="length" id="length_' +
-      index +
-      '" class="form-control input-sm text_only" data-toggle="tooltip" data-placement="bottom" title="' +
-      translate_length +
-      '"/>' +
-      "</div>" +
-      "</div>" +
-      "</div>";
-    html_code +=
-      '<div class="col-sm-12 col-md-6 col-lg-1">' +
-      '<div class="form-group">' +
-      '<label for="emailAddress1"> ' +
-      translate_width +
-      "</label>" +
-      '<div class="input-group">' +
-      '<input type="text" onchange="changePackage(this)" value="' +
-      item.width +
-      '" onkeypress="return isNumberKey(event, this)" name="width" id="width_' +
-      index +
-      '" class="form-control input-sm text_only" data-toggle="tooltip" data-placement="bottom" title="' +
-      translate_width +
-      '"/>' +
-      "</div>" +
-      "</div>" +
-      "</div>";
+    if (show_dimensions) {
+      html_code +=
+        '<div class="col-sm-12 col-md-6 col-lg-1">' +
+        '<div class="form-group">' +
+        '<label for="emailAddress1"> ' +
+        translate_length +
+        "</label>" +
+        '<div class="input-group">' +
+        '<input type="text" onchange="changePackage(this)" value="' +
+        item.length +
+        '" onkeypress="return isNumberKey(event, this)" name="length" id="length_' +
+        index +
+        '" class="form-control input-sm text_only" data-toggle="tooltip" data-placement="bottom" title="' +
+        translate_length +
+        '"/>' +
+        "</div>" +
+        "</div>" +
+        "</div>";
+      html_code +=
+        '<div class="col-sm-12 col-md-6 col-lg-1">' +
+        '<div class="form-group">' +
+        '<label for="emailAddress1"> ' +
+        translate_width +
+        "</label>" +
+        '<div class="input-group">' +
+        '<input type="text" onchange="changePackage(this)" value="' +
+        item.width +
+        '" onkeypress="return isNumberKey(event, this)" name="width" id="width_' +
+        index +
+        '" class="form-control input-sm text_only" data-toggle="tooltip" data-placement="bottom" title="' +
+        translate_width +
+        '"/>' +
+        "</div>" +
+        "</div>" +
+        "</div>";
+      html_code +=
+        '<div class="col-sm-12 col-md-6 col-lg-1">' +
+        '<div class="form-group">' +
+        '<label for="emailAddress1"> ' +
+        translate_height +
+        "</label>" +
+        '<div class="input-group">' +
+        '<input type="text" onchange="changePackage(this)" value="' +
+        item.height +
+        '" onkeypress="return isNumberKey(event, this)"  name="height" id="height_' +
+        index +
+        '" class="form-control input-sm number_only" data-toggle="tooltip" data-placement="bottom" title="' +
+        translate_height +
+        '" />' +
+        "</div>" +
+        "</div>" +
+        "</div>";
+      html_code +=
+        '<div class="col-sm-12 col-md-6 col-lg-1">' +
+        '<div class="form-group">' +
+        '<label for="emailAddress1"> ' +
+        translate_volweight +
+        "</label>" +
+        '<div class="input-group">' +
+        '<input type="text" readonly value="0" onkeypress="return isNumberKey(event, this)"  name="weightVol" id="weightVol_' +
+        index +
+        '" class="form-control input-sm number_only" data-toggle="tooltip" data-placement="bottom" title="' +
+        translate_volweight +
+        '" />' +
+        "</div>" +
+        "</div>" +
+        "</div>";
+    } else {
+      html_code += '<input type="hidden" name="length" id="length_' + index + '" value="' + (item.length || 0) + '" />';
+      html_code += '<input type="hidden" name="width" id="width_' + index + '" value="' + (item.width || 0) + '" />';
+      html_code += '<input type="hidden" name="height" id="height_' + index + '" value="' + (item.height || 0) + '" />';
+      html_code += '<input type="hidden" name="weightVol" id="weightVol_' + index + '" value="0" />';
+    }
 
-    html_code +=
-      '<div class="col-sm-12 col-md-6 col-lg-1">' +
-      '<div class="form-group">' +
-      '<label for="emailAddress1"> ' +
-      translate_height +
-      "</label>" +
-      '<div class="input-group">' +
-      '<input type="text" onchange="changePackage(this)" value="' +
-      item.height +
-      '" onkeypress="return isNumberKey(event, this)"  name="height" id="height_' +
-      index +
-      '" class="form-control input-sm number_only" data-toggle="tooltip" data-placement="bottom" title="' +
-      translate_height +
-      '" />' +
-      "</div>" +
-      "</div>" +
-      "</div>";
-
-    html_code +=
-      '<div class="col-sm-12 col-md-6 col-lg-1">' +
-      '<div class="form-group">' +
-      '<label for="emailAddress1"> ' +
-      translate_volweight +
-      "</label>" +
-      '<div class="input-group">' +
-      '<input type="text" readonly value="0" onkeypress="return isNumberKey(event, this)"  name="weightVol" id="weightVol_' +
-      index +
-      '" class="form-control input-sm number_only" data-toggle="tooltip" data-placement="bottom" title="' +
-      translate_volweight +
-      '" />' +
-      "</div>" +
-      "</div>" +
-      "</div>";
+    if (show_cbm_input) {
+      html_code +=
+        '<div class="col-sm-12 col-md-6 col-lg-1">' +
+        '<div class="form-group">' +
+        '<label for="emailAddress1"> CBM (m³)</label>' +
+        '<div class="input-group">' +
+        '<input type="text" onchange="changePackage(this)" value="' +
+        (item.cbm_value || 0) +
+        '" onkeypress="return isNumberKey(event, this)" name="cbm_value" id="cbm_value_' +
+        index +
+        '" class="form-control input-sm" style="border: 1px solid #36bea6;" data-toggle="tooltip" data-placement="bottom" title="CBM (Cubic Meter)"/>' +
+        "</div>" +
+        "</div>" +
+        "</div>";
+    } else {
+      html_code += '<input type="hidden" name="cbm_value" id="cbm_value_' + index + '" value="' + (item.cbm_value || 0) + '" />';
+    }
 
     html_code +=
       '<div class="col-sm-12 col-md-6 col-lg-1">' +
@@ -490,6 +518,7 @@ function addPackage() {
     weight: 0,
     declared_value: 0,
     fixed_value: 0,
+    cbm_value: 0,
   });
 
   var index = packagesItems.length - 1;

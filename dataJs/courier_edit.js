@@ -365,6 +365,10 @@ $("input[type=file]").on("change", function () {
 
 function loadPackages() {
   $("#data_items").html("");
+
+  var show_dimensions = $("#show_package_dimensions").val() == "1";
+  var show_cbm_input = $("#show_cbm_input_field").val() == "1";
+
   packagesItems.forEach(function (item, index) {
     var html_code = "";
     html_code += '<div  class= "card-hover" id="row_id_' + index + '">';
@@ -373,177 +377,89 @@ function loadPackages() {
     html_code +=
       '<div class="col-sm-12 col-md-6 col-lg-1">' +
       '<div class="form-group">' +
-      '<label for="emailAddress1"> ' +
-      translate_quantity +
-      "</label>" +
+      '<label for="emailAddress1"> ' + translate_quantity + "</label>" +
       '<div class="input-group">' +
-      '<input type="text" onchange="changePackage(this)" value="' +
-      item.qty +
-      '" onkeypress="return isNumberKey(event, this)"  name="qty" id="qty_' +
-      index +
-      '" class="form-control input-sm" data-toggle="tooltip" data-placement="bottom" title="' +
-      translate_quantity +
-      '"  value="1"  />' +
-      "</div>" +
-      "</div>" +
-      "</div>";
+      '<input type="text" onchange="changePackage(this)" value="' + item.qty +
+      '" onkeypress="return isNumberKey(event, this)"  name="qty" id="qty_' + index +
+      '" class="form-control input-sm" data-toggle="tooltip" data-placement="bottom" title="' + translate_quantity + '"  value="1"  />' +
+      "</div></div></div>";
 
     html_code +=
       '<div class="col-sm-12 col-md-6 col-lg-3">' +
       '<div class="form-group">' +
-      '<label for="emailAddress1"> ' +
-      translate_description +
-      "</label>" +
+      '<label for="emailAddress1"> ' + translate_description + "</label>" +
       '<div class="input-group">' +
-      '<input type="text" onchange="changePackage(this)" value="' +
-      item.description +
-      '" name="description" id="description_' +
-      index +
-      '" class="form-control input-sm" data-toggle="tooltip" data-placement="bottom" placeholder=" ' +
-      translate_description +
-      '" >' +
-      "</div>" +
-      "</div>" +
-      "</div>";
+      '<input type="text" onchange="changePackage(this)" value="' + item.description +
+      '" name="description" id="description_' + index +
+      '" class="form-control input-sm" data-toggle="tooltip" data-placement="bottom" placeholder=" ' + translate_description + '" >' +
+      "</div></div></div>";
 
     html_code +=
       '<div class="col-sm-12 col-md-6 col-lg-1">' +
       '<div class="form-group">' +
-      '<label for="emailAddress1"> ' +
-      translate_weight +
-      "</label>" +
+      '<label for="emailAddress1"> ' + translate_weight + "</label>" +
       '<div class="input-group">' +
-      '<input type="text" onchange="changePackage(this)" value="' +
-      item.weight +
-      '" onkeypress="return isNumberKey(event, this)"  name="weight" id="weight_' +
-      index +
-      '" class="form-control input-sm" style="border: 1px solid red;" data-toggle="tooltip" data-placement="bottom" title="' +
-      translate_weight +
-      '"/>' +
-      "</div>" +
-      "</div>" +
-      "</div>";
+      '<input type="text" onchange="changePackage(this)" value="' + item.weight +
+      '" onkeypress="return isNumberKey(event, this)"  name="weight" id="weight_' + index +
+      '" class="form-control input-sm" style="border: 1px solid red;" data-toggle="tooltip" data-placement="bottom" title="' + translate_weight + '"/>' +
+      "</div></div></div>";
+
+    if (show_dimensions) {
+      html_code +=
+        '<div class="col-sm-12 col-md-6 col-lg-1"><div class="form-group"><label for="emailAddress1"> ' + translate_length + "</label>" +
+        '<div class="input-group"><input type="text" onchange="changePackage(this)" value="' + item.length +
+        '" onkeypress="return isNumberKey(event, this)" name="length" id="length_' + index +
+        '" class="form-control input-sm text_only" data-toggle="tooltip" data-placement="bottom" title="' + translate_length + '"/></div></div></div>';
+      html_code +=
+        '<div class="col-sm-12 col-md-6 col-lg-1"><div class="form-group"><label for="emailAddress1"> ' + translate_width + "</label>" +
+        '<div class="input-group"><input type="text" onchange="changePackage(this)" value="' + item.width +
+        '" onkeypress="return isNumberKey(event, this)" name="width" id="width_' + index +
+        '" class="form-control input-sm text_only" data-toggle="tooltip" data-placement="bottom" title="' + translate_width + '"/></div></div></div>';
+      html_code +=
+        '<div class="col-sm-12 col-md-6 col-lg-1"><div class="form-group"><label for="emailAddress1"> ' + translate_height + "</label>" +
+        '<div class="input-group"><input type="text" onchange="changePackage(this)" value="' + item.height +
+        '" onkeypress="return isNumberKey(event, this)"  name="height" id="height_' + index +
+        '" class="form-control input-sm number_only" data-toggle="tooltip" data-placement="bottom" title="' + translate_height + '" /></div></div></div>';
+      html_code +=
+        '<div class="col-sm-12 col-md-6 col-lg-1"><div class="form-group"><label for="emailAddress1"> ' + translate_volweight + "</label>" +
+        '<div class="input-group"><input type="text" readonly value="0" onkeypress="return isNumberKey(event, this)"  name="weightVol" id="weightVol_' + index +
+        '" class="form-control input-sm number_only" data-toggle="tooltip" data-placement="bottom" title="' + translate_volweight + '" /></div></div></div>';
+    } else {
+      html_code += '<input type="hidden" name="length" id="length_' + index + '" value="' + (item.length || 0) + '" />';
+      html_code += '<input type="hidden" name="width" id="width_' + index + '" value="' + (item.width || 0) + '" />';
+      html_code += '<input type="hidden" name="height" id="height_' + index + '" value="' + (item.height || 0) + '" />';
+      html_code += '<input type="hidden" name="weightVol" id="weightVol_' + index + '" value="0" />';
+    }
+
+    if (show_cbm_input) {
+      html_code +=
+        '<div class="col-sm-12 col-md-6 col-lg-1"><div class="form-group"><label for="emailAddress1"> CBM (m³)</label>' +
+        '<div class="input-group"><input type="text" onchange="changePackage(this)" value="' + (item.cbm_value || 0) +
+        '" onkeypress="return isNumberKey(event, this)" name="cbm_value" id="cbm_value_' + index +
+        '" class="form-control input-sm" style="border: 1px solid #36bea6;" data-toggle="tooltip" data-placement="bottom" title="CBM (Cubic Meter)"/></div></div></div>';
+    } else {
+      html_code += '<input type="hidden" name="cbm_value" id="cbm_value_' + index + '" value="' + (item.cbm_value || 0) + '" />';
+    }
 
     html_code +=
-      '<div class="col-sm-12 col-md-6 col-lg-1">' +
-      '<div class="form-group">' +
-      '<label for="emailAddress1"> ' +
-      translate_length +
-      "</label>" +
-      '<div class="input-group">' +
-      '<input type="text" onchange="changePackage(this)" value="' +
-      item.length +
-      '" onkeypress="return isNumberKey(event, this)" name="length" id="length_' +
-      index +
-      '" class="form-control input-sm text_only" data-toggle="tooltip" data-placement="bottom" title="' +
-      translate_length +
-      '"/>' +
-      "</div>" +
-      "</div>" +
-      "</div>";
-    html_code +=
-      '<div class="col-sm-12 col-md-6 col-lg-1">' +
-      '<div class="form-group">' +
-      '<label for="emailAddress1"> ' +
-      translate_width +
-      "</label>" +
-      '<div class="input-group">' +
-      '<input type="text" onchange="changePackage(this)" value="' +
-      item.width +
-      '" onkeypress="return isNumberKey(event, this)" name="width" id="width_' +
-      index +
-      '" class="form-control input-sm text_only" data-toggle="tooltip" data-placement="bottom" title="' +
-      translate_width +
-      '"/>' +
-      "</div>" +
-      "</div>" +
-      "</div>";
+      '<div class="col-sm-12 col-md-6 col-lg-1"><div class="form-group"><label for="emailAddress1"> ' + translate_charge + "</label>" +
+      '<div class="input-group"><input type="text" onchange="changePackage(this)" value="' + item.fixed_value +
+      '" onkeypress="return isNumberKey(event, this)"  name="fixed_value" id="fixedValue_' + index +
+      '" class="form-control input-sm number_only" data-toggle="tooltip" data-placement="bottom" title="' + translate_charge + '"/></div></div></div>';
 
     html_code +=
-      '<div class="col-sm-12 col-md-6 col-lg-1">' +
-      '<div class="form-group">' +
-      '<label for="emailAddress1"> ' +
-      translate_height +
-      "</label>" +
-      '<div class="input-group">' +
-      '<input type="text" onchange="changePackage(this)" value="' +
-      item.height +
-      '" onkeypress="return isNumberKey(event, this)"  name="height" id="height_' +
-      index +
-      '" class="form-control input-sm number_only" data-toggle="tooltip" data-placement="bottom" title="' +
-      translate_height +
-      '" />' +
-      "</div>" +
-      "</div>" +
-      "</div>";
-
-    html_code +=
-      '<div class="col-sm-12 col-md-6 col-lg-1">' +
-      '<div class="form-group">' +
-      '<label for="emailAddress1"> ' +
-      translate_volweight +
-      "</label>" +
-      '<div class="input-group">' +
-      '<input type="text" readonly value="0" onkeypress="return isNumberKey(event, this)"  name="weightVol" id="weightVol_' +
-      index +
-      '" class="form-control input-sm number_only" data-toggle="tooltip" data-placement="bottom" title="' +
-      translate_volweight +
-      '" />' +
-      "</div>" +
-      "</div>" +
-      "</div>";
-
-    html_code +=
-      '<div class="col-sm-12 col-md-6 col-lg-1">' +
-      '<div class="form-group">' +
-      '<label for="emailAddress1"> ' +
-      translate_charge +
-      "</label>" +
-      '<div class="input-group">' +
-      '<input type="text" onchange="changePackage(this)" value="' +
-      item.fixed_value +
-      '" onkeypress="return isNumberKey(event, this)"  name="fixed_value" id="fixedValue_' +
-      index +
-      '" class="form-control input-sm number_only" data-toggle="tooltip" data-placement="bottom" title="' +
-      translate_charge +
-      '"/>' +
-      "</div>" +
-      "</div>" +
-      "</div>";
-
-    html_code +=
-      '<div class="col-sm-12 col-md-6 col-lg-1">' +
-      '<div class="form-group">' +
-      '<label for="emailAddress1"> ' +
-      translate_declared +
-      "</label>" +
-      '<div class="input-group">' +
-      '<input type="text" onchange="changePackage(this)" value="' +
-      item.declared_value +
-      '" onkeypress="return isNumberKey(event, this)"  name="declared_value" id="declaredValue_' +
-      index +
-      '" class="form-control input-sm number_only" data-toggle="tooltip" data-placement="bottom" title="' +
-      translate_declared +
-      '"/>' +
-      "</div>" +
-      "</div>" +
-      "</div>";
+      '<div class="col-sm-12 col-md-6 col-lg-1"><div class="form-group"><label for="emailAddress1"> ' + translate_declared + "</label>" +
+      '<div class="input-group"><input type="text" onchange="changePackage(this)" value="' + item.declared_value +
+      '" onkeypress="return isNumberKey(event, this)"  name="declared_value" id="declaredValue_' + index +
+      '" class="form-control input-sm number_only" data-toggle="tooltip" data-placement="bottom" title="' + translate_declared + '"/></div></div></div>';
 
     if (index > 0) {
       html_code +=
-        '<div class="col-sm-12 col-md-6 col-lg-1">' +
-        '<div class="form-group  mt-4">' +
-        '<button type="button"  onclick="deletePackage(' +
-        index +
-        ')"  name="remove_rows"  class="btn btn-outline-danger "><i class="fa fa-trash"></i>   </button>' +
-        "</div>" +
-        "</div>";
+        '<div class="col-sm-12 col-md-6 col-lg-1"><div class="form-group  mt-4">' +
+        '<button type="button"  onclick="deletePackage(' + index + ')"  name="remove_rows"  class="btn btn-outline-danger "><i class="fa fa-trash"></i>   </button>' +
+        "</div></div>";
     }
-    html_code += "</div>";
-
-    html_code += "<hr>";
-
-    html_code += "</div>";
+    html_code += "</div><hr></div>";
 
     $("#data_items").append(html_code);
   });

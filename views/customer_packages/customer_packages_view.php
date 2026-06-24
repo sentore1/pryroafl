@@ -843,8 +843,12 @@ if ($row_order->status_invoice == 1) {
                                                         <td><?php echo $track_item->t_dest; ?> /<br>
                                                             <?php echo $track_item->t_city; ?></td>
                                                         <td>
+                                                            <?php if ($status_courier_item) { ?>
                                                             <span class="label" style="background-color: <?php echo $status_courier_item->color; ?>"><?php echo $status_courier_item->mod_style; ?>
                                                             </span>
+                                                            <?php } else { ?>
+                                                            <span class="label"><?php echo $track_item->status_courier; ?></span>
+                                                            <?php } ?>
                                                         </td>
                                                         <td><?php echo $track_item->comments; ?></td>
 

@@ -12,6 +12,7 @@ var packagesItems = [
     weight: 0,
     declared_value: 0,
     fixed_value: 0,
+    cbm_value: 0,
   },
 ];
 
@@ -41,6 +42,11 @@ $(function () {
 
   cdp_select2_init_sender();
   cdp_select2_init_sender_address();
+
+  // CSV import listener — more reliable than inline onchange
+  $(document).on("change", "#csv_import_input", function () {
+    importPackagesFromCSV(this);
+  });
 });
 
 function cdp_load_countries(modal) {
@@ -146,6 +152,11 @@ function cdp_load_cities(modal) {
 
 function loadPackages() {
   $("#data_items").html("");
+
+  // Get CBM settings from hidden fields
+  var show_dimensions = $("#show_package_dimensions").val() == "1";
+  var show_cbm_input = $("#show_cbm_input_field").val() == "1";
+
   packagesItems.forEach(function (item, index) {
     var html_code = "";
     html_code += '<div  class= "card-hover" id="row_id_' + index + '">';
@@ -205,74 +216,101 @@ function loadPackages() {
       "</div>" +
       "</div>";
 
-    html_code +=
-      '<div class="col-sm-12 col-md-6 col-lg-1">' +
-      '<div class="form-group">' +
-      '<label for="emailAddress1"> ' +
-      translate_length +
-      "</label>" +
-      '<div class="input-group">' +
-      '<input type="text" onchange="changePackage(this)" value="' +
-      item.length +
-      '" onkeypress="return isNumberKey(event, this)" name="length" id="length_' +
-      index +
-      '" class="form-control input-sm text_only" data-toggle="tooltip" data-placement="bottom" title="' +
-      translate_length +
-      '"/>' +
-      "</div>" +
-      "</div>" +
-      "</div>";
-    html_code +=
-      '<div class="col-sm-12 col-md-6 col-lg-1">' +
-      '<div class="form-group">' +
-      '<label for="emailAddress1"> ' +
-      translate_width +
-      "</label>" +
-      '<div class="input-group">' +
-      '<input type="text" onchange="changePackage(this)" value="' +
-      item.width +
-      '" onkeypress="return isNumberKey(event, this)" name="width" id="width_' +
-      index +
-      '" class="form-control input-sm text_only" data-toggle="tooltip" data-placement="bottom" title="' +
-      translate_width +
-      '"/>' +
-      "</div>" +
-      "</div>" +
-      "</div>";
+    // Conditionally show dimension fields (Length / Width / Height)
+    if (show_dimensions) {
+      html_code +=
+        '<div class="col-sm-12 col-md-6 col-lg-1">' +
+        '<div class="form-group">' +
+        '<label for="emailAddress1"> ' +
+        translate_length +
+        "</label>" +
+        '<div class="input-group">' +
+        '<input type="text" onchange="changePackage(this)" value="' +
+        item.length +
+        '" onkeypress="return isNumberKey(event, this)" name="length" id="length_' +
+        index +
+        '" class="form-control input-sm text_only" data-toggle="tooltip" data-placement="bottom" title="' +
+        translate_length +
+        '"/>' +
+        "</div>" +
+        "</div>" +
+        "</div>";
+      html_code +=
+        '<div class="col-sm-12 col-md-6 col-lg-1">' +
+        '<div class="form-group">' +
+        '<label for="emailAddress1"> ' +
+        translate_width +
+        "</label>" +
+        '<div class="input-group">' +
+        '<input type="text" onchange="changePackage(this)" value="' +
+        item.width +
+        '" onkeypress="return isNumberKey(event, this)" name="width" id="width_' +
+        index +
+        '" class="form-control input-sm text_only" data-toggle="tooltip" data-placement="bottom" title="' +
+        translate_width +
+        '"/>' +
+        "</div>" +
+        "</div>" +
+        "</div>";
+      html_code +=
+        '<div class="col-sm-12 col-md-6 col-lg-1">' +
+        '<div class="form-group">' +
+        '<label for="emailAddress1"> ' +
+        translate_height +
+        "</label>" +
+        '<div class="input-group">' +
+        '<input type="text" onchange="changePackage(this)" value="' +
+        item.height +
+        '" onkeypress="return isNumberKey(event, this)"  name="height" id="height_' +
+        index +
+        '" class="form-control input-sm number_only" data-toggle="tooltip" data-placement="bottom" title="' +
+        translate_height +
+        '" />' +
+        "</div>" +
+        "</div>" +
+        "</div>";
 
-    html_code +=
-      '<div class="col-sm-12 col-md-6 col-lg-1">' +
-      '<div class="form-group">' +
-      '<label for="emailAddress1"> ' +
-      translate_height +
-      "</label>" +
-      '<div class="input-group">' +
-      '<input type="text" onchange="changePackage(this)" value="' +
-      item.height +
-      '" onkeypress="return isNumberKey(event, this)"  name="height" id="height_' +
-      index +
-      '" class="form-control input-sm number_only" data-toggle="tooltip" data-placement="bottom" title="' +
-      translate_height +
-      '" />' +
-      "</div>" +
-      "</div>" +
-      "</div>";
+      html_code +=
+        '<div class="col-sm-12 col-md-6 col-lg-1">' +
+        '<div class="form-group">' +
+        '<label for="emailAddress1"> ' +
+        translate_volweight +
+        "</label>" +
+        '<div class="input-group">' +
+        '<input type="text" readonly value="0" onkeypress="return isNumberKey(event, this)"  name="weightVol" id="weightVol_' +
+        index +
+        '" class="form-control input-sm number_only" data-toggle="tooltip" data-placement="bottom" title="' +
+        translate_volweight +
+        '" />' +
+        "</div>" +
+        "</div>" +
+        "</div>";
+    } else {
+      // Hidden placeholders to keep data structure consistent
+      html_code += '<input type="hidden" name="length" id="length_' + index + '" value="' + (item.length || 0) + '" />';
+      html_code += '<input type="hidden" name="width" id="width_' + index + '" value="' + (item.width || 0) + '" />';
+      html_code += '<input type="hidden" name="height" id="height_' + index + '" value="' + (item.height || 0) + '" />';
+      html_code += '<input type="hidden" name="weightVol" id="weightVol_' + index + '" value="0" />';
+    }
 
-    html_code +=
-      '<div class="col-sm-12 col-md-6 col-lg-1">' +
-      '<div class="form-group">' +
-      '<label for="emailAddress1"> ' +
-      translate_volweight +
-      "</label>" +
-      '<div class="input-group">' +
-      '<input type="text" readonly value="0" onkeypress="return isNumberKey(event, this)"  name="weightVol" id="weightVol_' +
-      index +
-      '" class="form-control input-sm number_only" data-toggle="tooltip" data-placement="bottom" title="' +
-      translate_volweight +
-      '" />' +
-      "</div>" +
-      "</div>" +
-      "</div>";
+    // Conditionally show CBM direct input field
+    if (show_cbm_input) {
+      html_code +=
+        '<div class="col-sm-12 col-md-6 col-lg-1">' +
+        '<div class="form-group">' +
+        '<label for="emailAddress1"> CBM (m³)</label>' +
+        '<div class="input-group">' +
+        '<input type="text" onchange="changePackage(this)" value="' +
+        (item.cbm_value || 0) +
+        '" onkeypress="return isNumberKey(event, this)" name="cbm_value" id="cbm_value_' +
+        index +
+        '" class="form-control input-sm" data-toggle="tooltip" data-placement="bottom" title="CBM (Cubic Meter)" style="border: 1px solid #36bea6;"/>' +
+        "</div>" +
+        "</div>" +
+        "</div>";
+    } else {
+      html_code += '<input type="hidden" name="cbm_value" id="cbm_value_' + index + '" value="' + (item.cbm_value || 0) + '" />';
+    }
 
     html_code +=
       '<div class="col-sm-12 col-md-6 col-lg-1">' +
@@ -337,21 +375,35 @@ function importPackagesFromCSV(input) {
   var reader = new FileReader();
   reader.onload = function (e) {
     var lines = e.target.result.split("\n").filter(function (l) { return l.trim() !== ""; });
-    // Skip header row
+    if (lines.length < 2) return;
+
+    // Parse headers from first row to build a name→index map
+    var headers = lines[0].split(",").map(function(h) { return h.trim().replace(/^\uFEFF/, "").toLowerCase(); });
+    var idx = {};
+    headers.forEach(function(h, i) { idx[h] = i; });
+
+    var imported = [];
     for (var i = 1; i < lines.length; i++) {
       var cols = lines[i].split(",");
-      if (cols.length < 8) continue;
-      packagesItems.push({
-        qty:            parseFloat(cols[0]) || 1,
-        description:    cols[1] ? cols[1].trim() : "",
-        weight:         parseFloat(cols[2]) || 0,
-        length:         parseFloat(cols[3]) || 0,
-        width:          parseFloat(cols[4]) || 0,
-        height:         parseFloat(cols[5]) || 0,
-        fixed_value:    parseFloat(cols[6]) || 0,
-        declared_value: parseFloat(cols[7]) || 0,
+      if (cols.length < 3) continue;
+      imported.push({
+        qty:            parseFloat(cols[idx['qty']])            || 1,
+        description:    cols[idx['description']] ? cols[idx['description']].trim() : "",
+        weight:         parseFloat(cols[idx['weight']])         || 0,
+        length:         parseFloat(cols[idx['length']])         || 0,
+        width:          parseFloat(cols[idx['width']])          || 0,
+        height:         parseFloat(cols[idx['height']])         || 0,
+        cbm_value:      parseFloat(cols[idx['cbm']])            || 0,
+        fixed_value:    parseFloat(cols[idx['fixed_charge']])   || 0,
+        declared_value: parseFloat(cols[idx['declared_value']]) || 0,
       });
     }
+
+    if (imported.length > 0) {
+      // Replace the current list entirely with what was imported
+      packagesItems = imported;
+    }
+
     loadPackages();
     calculateFinalTotal();
     input.value = "";
@@ -369,6 +421,7 @@ function addPackage() {
     weight: 0,
     declared_value: 0,
     fixed_value: 0,
+    cbm_value: 0,
   });
 
   var index = packagesItems.length - 1;
@@ -454,27 +507,40 @@ function calculateFinalTotal(element = null) {
   var price_lb = $("#price_lb").val();
   var insured_value = $("#insured_value").val();
 
+  // Get CBM settings
+  var show_dimensions = $("#show_package_dimensions").val() == "1";
+  var show_cbm_input = $("#show_cbm_input_field").val() == "1";
+
   reexpedicion_value = parseFloat(reexpedicion_value);
   insured_value = parseFloat(insured_value);
   price_lb = parseFloat(price_lb);
 
   packagesItems.forEach(function (item, i) {
     var quantity = parseFloat(item.qty);
-    var description = parseFloat(item.description);
     var weight = parseFloat(item.weight);
-    var length = parseFloat(item.length);
-    var width = parseFloat(item.width);
-    var height = parseFloat(item.height);
+    var length = parseFloat(item.length) || 0;
+    var width = parseFloat(item.width) || 0;
+    var height = parseFloat(item.height) || 0;
     var fixed_value = parseFloat(item.fixed_value);
     var declared_value = parseFloat(item.declared_value);
+    var cbm_input = parseFloat(item.cbm_value) || 0;
 
     var core_meter = $("#core_meter").val();
     var core_min_cost_tax = $("#core_min_cost_tax").val();
     var core_min_cost_declared_tax = $("#core_min_cost_declared_tax").val();
 
-    var total_metric = (length * width * height) / core_meter;
-    total_metric = parseFloat(total_metric);
+    var total_metric = 0;
 
+    // Calculate based on available input method
+    if (show_cbm_input && cbm_input > 0) {
+      // Use CBM input directly, convert back to volumetric weight
+      total_metric = cbm_input * 1000000 / core_meter;
+    } else if (show_dimensions && length > 0 && width > 0 && height > 0) {
+      // Calculate from dimensions
+      total_metric = (length * width * height) / core_meter;
+    }
+
+    total_metric = parseFloat(total_metric);
     $("#weightVol_" + i).val(total_metric.toFixed(2));
 
     sumador_libras += weight;
@@ -524,15 +590,11 @@ function calculateFinalTotal(element = null) {
   }
 
   $("#subtotal").html(sumador_total.toFixed(2));
-  // $('#total_declared').html(sumador_valor_declarado);
   $("#discount").html(total_descuento.toFixed(2));
   $("#impuesto").html(total_impuesto.toFixed(2));
   $("#declared_value_label").html(total_valor_declarado.toFixed(2));
   $("#fixed_value_label").html(max_fixed_charge.toFixed(2));
   $("#insurance").html(total_seguro.toFixed(2));
-  // $('#total_libras').html(sumador_libras);
-  // $('#total_volumetrico').html(sumador_volumetric);
-  // $('#total_peso').html(total_peso);
   $("#total_impuesto_aduanero").html(total_impuesto_aduanero.toFixed(2));
   $("#total_envio").html(total_envio.toFixed(2));
   $("#total_weight").html(sumador_libras.toFixed(2));
@@ -543,6 +605,10 @@ function calculateFinalTotal(element = null) {
 
 $("#invoice_form").on("submit", function (event) {
   // sweealert 2, alerta error informacion de paquetes
+
+  // Get CBM settings
+  var show_dimensions = $("#show_package_dimensions").val() == "1";
+  var show_cbm_input = $("#show_cbm_input_field").val() == "1";
 
   for (let [i, val] of packagesItems.entries()) {
     if ($.trim($("#description_" + i).val()).length == 0) {
@@ -575,36 +641,55 @@ $("#invoice_form").on("submit", function (event) {
       $("#weight_" + i).focus();
       return false;
     }
-    if ($.trim($("#length_" + i).val()).length == 0) {
-      Swal.fire({
-        type: "Error!",
-        text: validation_length,
-        icon: "error",
-        confirmButtonText: "Ok",
-      });
-      $("#length_" + i).focus();
-      return false;
+
+    // Validate dimensions only if dimension fields are shown
+    if (show_dimensions) {
+      if ($.trim($("#length_" + i).val()).length == 0) {
+        Swal.fire({
+          type: "Error!",
+          text: validation_length,
+          icon: "error",
+          confirmButtonText: "Ok",
+        });
+        $("#length_" + i).focus();
+        return false;
+      }
+      if ($.trim($("#width_" + i).val()).length == 0) {
+        Swal.fire({
+          type: "Error!",
+          text: validation_width,
+          icon: "error",
+          confirmButtonText: "Ok",
+        });
+        $("#width_" + i).focus();
+        return false;
+      }
+      if ($.trim($("#height_" + i).val()).length == 0) {
+        Swal.fire({
+          type: "Error!",
+          text: validation_height,
+          icon: "error",
+          confirmButtonText: "Ok",
+        });
+        $("#height_" + i).focus();
+        return false;
+      }
     }
-    if ($.trim($("#width_" + i).val()).length == 0) {
-      Swal.fire({
-        type: "Error!",
-        text: validation_width,
-        icon: "error",
-        confirmButtonText: "Ok",
-      });
-      $("#width_" + i).focus();
-      return false;
+
+    // Validate CBM only if CBM input is shown and dimensions are not shown
+    if (show_cbm_input && !show_dimensions) {
+      if ($.trim($("#cbm_value_" + i).val()).length == 0 || parseFloat($("#cbm_value_" + i).val()) == 0) {
+        Swal.fire({
+          type: "Error!",
+          text: "CBM value is required",
+          icon: "error",
+          confirmButtonText: "Ok",
+        });
+        $("#cbm_value_" + i).focus();
+        return false;
+      }
     }
-    if ($.trim($("#height_" + i).val()).length == 0) {
-      Swal.fire({
-        type: "Error!",
-        text: validation_height,
-        icon: "error",
-        confirmButtonText: "Ok",
-      });
-      $("#height_" + i).focus();
-      return false;
-    }
+
     if ($.trim($("#fixedValue_" + i).val()).length == 0) {
       Swal.fire({
         type: "Error!",

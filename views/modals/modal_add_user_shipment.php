@@ -6,8 +6,8 @@
 					<h4 class="modal-title"><?php echo $lang['modal-text1'] ?></h4>
 					<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
 				</div>
+				<form class="form-horizontal" method="post" id="add_user_from_modal_shipments" name="add_user_from_modal_shipments">
 				<div class="modal-body">
-					<form class="form-horizontal" method="post" id="add_user_from_modal_shipments" name="add_user_from_modal_shipments">
 
 						<input type="hidden" id="type_user" name="type_user">
 

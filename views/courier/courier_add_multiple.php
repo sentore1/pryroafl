@@ -691,11 +691,11 @@ $order_prefix = $settings->prefix;
                                             <button type="button" onclick="addPackage()" name="add_rows" id="add_rows" class="btn btn-outline-dark"><span class="fa fa-plus"></span> <?php echo $lang['left231'] ?></button>
                                         </div>
                                         <div class="col-md-5 text-left">
-                                            <input type="file" id="csv_import_input" accept=".csv" style="display:none;" onchange="importPackagesFromCSV(this)">
+                                            <input type="file" id="csv_import_input" accept=".csv" style="display:none;">
                                             <button type="button" onclick="document.getElementById('csv_import_input').click()" class="btn btn-outline-info">
                                                 <span class="fa fa-upload"></span> Import CSV
                                             </button>
-                                            <a href="assets/templates/packages_import_template.csv" download class="btn btn-outline-secondary ml-2">
+                                            <a href="download_template_packages.php" class="btn btn-outline-secondary ml-2">
                                                 <span class="fa fa-download"></span> Download Template
                                             </a>
                                         </div>
@@ -930,6 +930,10 @@ $order_prefix = $settings->prefix;
                     <input type="hidden" name="core_meter" id="core_meter" value="<?php echo $core->meter; ?>" />
                     <input type="hidden" name="core_min_cost_tax" id="core_min_cost_tax" value="<?php echo $core->min_cost_tax; ?>" />
                     <input type="hidden" name="core_min_cost_declared_tax" id="core_min_cost_declared_tax" value="<?php echo $core->min_cost_declared_tax; ?>" />
+
+                    <!-- CBM Settings -->
+                    <input type="hidden" name="show_package_dimensions" id="show_package_dimensions" value="<?php echo $core->show_package_dimensions ?? 1; ?>" />
+                    <input type="hidden" name="show_cbm_input_field" id="show_cbm_input_field" value="<?php echo $core->show_cbm_input_field ?? 0; ?>" />
             </form>
 
             <?php include('views/modals/modal_add_user_shipment.php'); ?>
